@@ -1,5 +1,5 @@
-# Proyecto: Sistema de gestión de competencias
-  Producción de Software
+# Proyecto: Sistema de gestión de competencias - Producción de Software
+  
 
 
 #Integrantes
