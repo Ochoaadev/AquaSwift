@@ -2,23 +2,23 @@
   
 
 
-#Integrantes
+# Integrantes
    - Adolfo Ochoa
    - Juan Alvarez
    - Elias Guillen
    - Esteban Gómez
 
   
-#Descripción
+# Descripción
   - Por definir
 
-#Maquetación
+# Maquetación
   - Por definir
   
-#Diseño de base de datos
+# Diseño de base de datos
   - Por definir
   
-#Comandos usados
+# Comandos usados
   - Por definir
 
 # Desarrollo de funcionalidades
