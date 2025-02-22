@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+ background: #242424;
+ color: #ffffff;
+}
+
+.montserrat {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto; 
+    font-style: normal;
+  }
+  
+  .poppins {
+    font-family: "Poppins", sans-serif;
+    font-style: normal;
+  }
