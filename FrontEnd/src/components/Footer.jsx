@@ -3,7 +3,7 @@ import logo from "/logo.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-primary-700 text-center lg:text-left md:flex md:justify-center md:items-center md:flex-row flex-col mt-8 pb-5">
+    <footer className="bg-primary-700 text-center lg:text-left md:flex md:justify-center md:items-center md:flex-row flex-col mt-8 py-5">
       <div className="flex justify-center items-center">
         <img src={logo} alt="Logo" className="w-36 mr-4 animate-pulse" />
       </div>
