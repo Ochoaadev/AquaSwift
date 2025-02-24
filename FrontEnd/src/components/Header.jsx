@@ -1,10 +1,21 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
+
 
 function header() {
   return (
     <div className='bg-primary-500 h-24 flex items-center justify-center'>
-      <h1>Header</h1>
+
+      <Link  to={"/"}>
+              <h1  className="text-xl px-6 py-2 poppins font-bold cursor-pointer">Home</h1>  
+      </Link>
+
+      <Link  to={"/AboutUs"}>
+              <h1  className="text-xl px-6 py-2 poppins font-bold cursor-pointer">AboutUs</h1>  
+      </Link>
     </div>
+
+    
   )
 }
 
