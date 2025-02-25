@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-
 import Footer from "../components/Footer"
 import Header from "../components/Header"
 import Banner from "/bannerNata.jpg"
@@ -55,7 +54,7 @@ export default function LandingPage() {
             mismo <br />
           </h1>
 
-            <Link className="bg-gradient-to-r from-primary-100 to-primary-500 rounded-xl overflow-hidden mt-4 animate-bounce" to={"/registro"}>
+            <Link to='/register' className="bg-gradient-to-r from-primary-100 to-primary-500 rounded-xl overflow-hidden mt-4 animate-bounce">
               <h1  className="text-4xl px-6 py-2 poppins font-bold cursor-pointer">Registro</h1>  
             </Link>
 
