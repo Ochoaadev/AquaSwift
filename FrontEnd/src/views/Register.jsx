@@ -2,8 +2,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useState } from "react";
 import { Link } from 'react-router-dom';
+import { useAuth } from "../contexts/AuthProvider";
+import { api } from "../service/apiService";
+import { toast } from "react-hot-toast";
 
 export default function Register() {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -123,16 +127,21 @@ export default function Register() {
       validateField(key, formData[key]);
     });
 
+    // si no hay errores enviar el registro al backend.
     if (Object.keys(errors).length === 0) {
       try {
         console.log("Datos enviados:", formData);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        alert("Registro exitoso!");
+        const response = await api.auth.register(formData);
+        login(response.user);
+        toast.success(response.message);
+        //despuess del registro exitoso redirigir a la pagina principal.
       } catch (error) {
-        console.error("Error al enviar:", error);
+        console.log("Error al enviar:", error);
+        toast.error(error?.response?.data?.message || "Error en el registro", {
+          position: "bottom-right"
+        });
       }
     }
-
     setIsSubmitting(false);
   };
 
@@ -157,7 +166,9 @@ export default function Register() {
                 className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
               />
               {errors.fullName && (
-                <div className='text-red-300 text-sm mt-1'>{errors.fullName}</div>
+                <div className='text-red-300 text-sm mt-1'>
+                  {errors.fullName}
+                </div>
               )}
             </div>
 
@@ -187,7 +198,9 @@ export default function Register() {
                 className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
               />
               {errors.password && (
-                <div className='text-red-300 text-sm mt-1'>{errors.password}</div>
+                <div className='text-red-300 text-sm mt-1'>
+                  {errors.password}
+                </div>
               )}
             </div>
 
@@ -198,7 +211,7 @@ export default function Register() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder='Confirmar Contraseña'
-               style={{ background: "transparent" }}
+                style={{ background: "transparent" }}
                 className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
               />
               {errors.confirmPassword && (

@@ -2,8 +2,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../contexts/AuthProvider";
+import { api } from "../service/apiService";
 
 export default function Login() {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -61,13 +65,18 @@ export default function Login() {
       validateField(key, formData[key]);
     });
 
+    // si no hay errores enviar credenciales a la api.
     if (Object.keys(errors).length === 0) {
       try {
         console.log("Datos enviados:", formData);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        alert("Login exitoso!");
+        const userData = await api.auth.login(formData);
+        login(userData.user);
+        toast.success("Bienvenido de nuevo!");
       } catch (error) {
-        console.error("Error al enviar:", error);
+        toast.error(
+          error?.response?.data?.message || "Error al iniciar sesión.",
+          { position: "bottom-right" }
+        );
       }
     }
 
