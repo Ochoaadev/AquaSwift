@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../contexts/AuthProvider";
 import { api } from "../service/apiService";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const { login } = useAuth();
@@ -86,7 +87,12 @@ export default function Login() {
   return (
     <div className='min-h-screen flex flex-col'>
       <Header />
-      <div className='flex-grow flex items-center justify-center px-4 py-8'>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className='flex-grow flex items-center justify-center px-4 py-8'
+      >
         <div className='w-full max-w-md p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
           <h1 className='text-3xl font-bold text-center text-white mb-2'>
             Bienvenido
@@ -137,12 +143,15 @@ export default function Login() {
 
           <div className='mt-6 flex justify-between'>
             <span className='text-white'>No tienes una cuenta?</span>
-            <Link to='/register' className='text-[#D8B4FE] hover:underline'>
+            <Link
+              to='/register'
+              className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70'
+            >
               Regístrate
             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
       <Footer />
     </div>
   );

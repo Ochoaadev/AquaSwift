@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthProvider";
 import { api } from "../service/apiService";
 import { toast } from "react-hot-toast";
+import { motion } from "framer-motion";
 
 export default function Register() {
   const { login } = useAuth();
@@ -148,7 +149,13 @@ export default function Register() {
   return (
     <div className='min-h-screen flex flex-col'>
       <Header />
-      <div className='flex-grow flex items-center justify-center px-4 py-8'>
+      {/* <div className='flex-grow flex items-center justify-center px-4 py-8'> */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className='flex-grow flex items-center justify-center px-4 py-8'
+      >
         <div className='w-full max-w-md p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
           <h1 className='text-3xl font-bold text-center text-white mb-6'>
             Registrate con <span className='text-[#BEB5F9]'>nosotros!</span>
@@ -278,12 +285,16 @@ export default function Register() {
 
           <div className='mt-6 flex justify-between'>
             <span className='text-white'>Ya tienes una cuenta?</span>
-            <Link to='/login' className='text-[#D8B4FE] hover:underline'>
+            <Link
+              to='/login'
+              className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70'
+            >
               Inicia Sesión
             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
+      {/* </div> */}
       <Footer />
     </div>
   );
