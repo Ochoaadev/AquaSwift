@@ -22,42 +22,89 @@ function AboutUs() {
     </div>
 
     <div className='px-5 w-11/12 mx-auto mt-5'>
-        <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
-
-            <div>
-                <img src={juan} alt="Juan Alvarez" className="transition hover:scale-105 duration-200 rounded-2xl" />
-                <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
-                    <h1 className='text-primary-400'>CEO</h1>
-                    <h1>Fundador</h1>
-                </div>
-            </div>
-
-            <div>
-                 <img src={adolfo} alt="Adolfo Ochoa" className="transition hover:scale-105 duration-200 rounded-2xl" />
-                 <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
-                    <h1 className='text-primary-400'>CEO</h1>
-                    <h1>Fundador</h1>
-                </div>
-            </div>
-
-            <div>
-                 <img src={elias} alt="Elias Guillen" className="transition hover:scale-105 duration-200 rounded-2xl" />
-                 <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
-                    <h1 className='text-primary-400'>CEO</h1>
-                    <h1>Fundador</h1>
-                </div>
-            </div>
-
-            <div>
-                 <img src={esteban} alt="Esteban Eli" className="transition hover:scale-105 duration-200 rounded-2xl" />
-                 <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
-                    <h1 className='text-primary-400'>CEO</h1>
-                    <h1>Fundador</h1>
-                </div>
-            </div>
-
+  <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+    
+    {/* Juan Alvarez */}
+    <div>
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+        <img
+          src={juan}
+          alt="Juan Alvarez"
+          className="rounded-2xl"
+        />
+        <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
+          <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Juan Alvarez
+          </span>
         </div>
-    </div>     
+      </div>
+      <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
+        <h1 className='text-primary-400'>CEO</h1>
+        <h1>Fundador</h1>
+      </div>
+    </div>
+
+    {/* Adolfo Ochoa */}
+    <div>
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+        <img
+          src={adolfo}
+          alt="Adolfo Ochoa"
+          className="rounded-2xl"
+        />
+        <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
+          <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Adolfo Ochoa
+          </span>
+        </div>
+      </div>
+      <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
+        <h1 className='text-primary-400'>CEO</h1>
+        <h1>Fundador</h1>
+      </div>
+    </div>
+
+    {/* Elias Guillen */}
+    <div>
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+        <img
+          src={elias}
+          alt="Elias Guillen"
+          className="rounded-2xl"
+        />
+        <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
+          <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Elias Guillen
+          </span>
+        </div>
+      </div>
+      <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
+        <h1 className='text-primary-400'>CEO</h1>
+        <h1>Fundador</h1>
+      </div>
+    </div>
+
+    {/* Esteban Eli */}
+    <div>
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+        <img
+          src={esteban}
+          alt="Esteban Eli"
+          className="rounded-2xl"
+        />
+        <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
+          <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Esteban Eli
+          </span>
+        </div>
+      </div>
+      <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
+        <h1 className='text-primary-400'>CEO</h1>
+        <h1>Fundador</h1>
+      </div>
+    </div>
+  </div>
+</div>
 
     <div className='px-5 w-11/12 mx-auto mt-8'>
         <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-1 gap-5 '>
