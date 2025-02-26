@@ -149,7 +149,6 @@ export default function Register() {
   return (
     <div className='min-h-screen flex flex-col'>
       <Header />
-      {/* <div className='flex-grow flex items-center justify-center px-4 py-8'> */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -294,7 +293,6 @@ export default function Register() {
           </div>
         </div>
       </motion.div>
-      {/* </div> */}
       <Footer />
     </div>
   );
