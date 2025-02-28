@@ -1,10 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+
+import ScrollToTopButton from './components/BackToTop.jsx';
+import ScrollProgressBar from './components/ScrollProgressBar.jsx';
 import './index.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
+    <ScrollToTopButton />
+    <ScrollProgressBar />
   </StrictMode>,
 )

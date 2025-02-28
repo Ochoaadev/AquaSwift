@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const schema = mongoose.Schema
-const bcrypt = require('bcrypt')
 
 const AdminSchema = new schema({
     Nombre_Apellido:{
