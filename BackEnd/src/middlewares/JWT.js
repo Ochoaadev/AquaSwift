@@ -39,31 +39,31 @@ function DecodificarToken(token) {
   });
 }
 
-const ValidarRol = async (req, res) => {
-  if (!req.headers.authorization) {
-    return res.status(401).json({ message: "Token no proporcionado" });
-  }
+// const ValidarRol = async (req, res) => {
+//   if (!req.headers.authorization) {
+//     return res.status(401).json({ message: "Token no proporcionado" });
+//   }
 
-  const token = req.headers.authorization.replace("Bearer ", "");
+//   const token = req.headers.authorization.replace("Bearer ", "");
 
-  try {
-    // Decodificando y verificando el token
-    const payload = await DecodificarToken(token);
+//   try {
+//     // Decodificando y verificando el token
+//     const payload = await DecodificarToken(token);
 
-    if (payload && payload.rol) {
-      // Aquí puedes comparar el rol esperado 
-      res.status(200).json({ payload, message: "Rol validado", status: 200 });
-    } else {
-      res.status(403).json({ message: "Permisos insuficientes" });
-    }
-  } catch (error) {
-    res.status(401).json({ message: error });
-  }
-};
+//     if (payload && payload.rol) {
+//       // Aquí puedes comparar el rol esperado 
+//       res.status(200).json({ payload, message: "Rol validado", status: 200 });
+//     } else {
+//       res.status(403).json({ message: "Permisos insuficientes" });
+//     }
+//   } catch (error) {
+//     res.status(401).json({ message: error });
+//   }
+// };
 
 module.exports = { 
     GenerarToken, 
     Autenticacion, 
     DecodificarToken, 
-    ValidarRol 
+    // ValidarRol 
 };

@@ -12,19 +12,13 @@ const AdminSchema = new schema({
         required: true,
         unique: true
     },
-    Contraseña:{
+    Contrasena:{
         type:String,
         required: true
+    },
+    Rol:{
+        type: String
     }
 })
-
-AdminSchema.statics.encryptPassword = async(Contraseña)=>{
-    const salt = await bcrypt.genSalt(10);
-    return await bcrypt.hash(Contraseña, salt)
-  }
-  
-AdminSchema.statics.comparePassword = async(Contraseña, receivedContraseña) =>{
-    return await bcrypt.compare(Contraseña, receivedContraseña)
-  }
 
 module.exports = mongoose.model('Admin', AdminSchema);

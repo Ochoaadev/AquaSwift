@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var dbconnection = require('./src/config/Conexion')
-var indexRouter = require('./src/routes/index');
+var routes = require('./src/routes/routes');
 const bodyParser = require('body-parser');
 const fs = require('fs')
 
@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/api', routes);
 
 const CheckEnv = () => {
     try {

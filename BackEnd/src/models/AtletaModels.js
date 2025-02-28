@@ -17,7 +17,7 @@ const AtletaSchema = new schema({
         required: true,
         unique: true
     },
-    Contraseña:{
+    Contrasena:{
         type: String,
         required: true
     },
@@ -25,6 +25,9 @@ const AtletaSchema = new schema({
         type: Number,
         required: true,
         unique: true
+    },
+    Rol:{
+        type: String
     },
     Fecha_Nacimiento:{
         type: Date,

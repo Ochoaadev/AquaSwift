@@ -1,16 +1,19 @@
-const Atleta = require('../models/Usuarios');
+const Atleta = require('../../models/AtletaModels');
+const Administrador = require('../../models/AdminModel');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 require('dotenv')
 
 exports.signUp = async (req, res) =>{
-    const {Nombre_Apellido, Username, Email, Contraseña, DNI, Fecha_Nacimiento} = req.body;
+    const {Nombre_Apellido, Username, Email, Contrasena, DNI, Fecha_Nacimiento} = req.body;
 
     const newUser = new Atleta({
         Nombre_Apellido,
         Username, 
         Email,
-        Contraseña: await Atleta.encryptPassword(Contraseña),
+        Contrasena: await Atleta.encryptPassword(Contrasena),
         DNI,
+        Rol: "Usuario",
         Fecha_Nacimiento
     })
 
@@ -25,17 +28,24 @@ exports.signUp = async (req, res) =>{
     })
 }
 
-exports.signIp = async (req, res) => { 
+exports.signIn = async (req, res) => {
     try {
-        // Buscar usuario por Email
-        const userFound = await Atleta.findOne({ Email: req.body.Email });
+        const { Email, Contrasena } = req.body;
+
+        let userFound = await Atleta.findOne({ Email }); // Buscar en Atleta
+        let Rol = "Usuario";
+
+        if (!userFound) {
+            userFound = await Administrador.findOne({ Email }); // Buscar en Administrador
+            Rol = "Admin";
+        }
 
         if (!userFound) {
             return res.status(400).json({ message: "El usuario no fue encontrado" });
         }
 
         // Verificar contraseña
-        const ConfirmarPassword = await Atleta.comparePassword(req.body.Contraseña, userFound.Contraseña);
+        const ConfirmarPassword = await bcrypt.compare(Contrasena, userFound.Contrasena || userFound.Contrasena);
         if (!ConfirmarPassword) {
             return res.status(401).json({
                 token: null,
@@ -44,11 +54,13 @@ exports.signIp = async (req, res) => {
         }
 
         // Generar token JWT
-        const token = jwt.sign({ id: userFound._id }, process.env.SECRET, {
-            expiresIn: 86400 // 24 horas
-        });
+        const token = jwt.sign(
+            { id: userFound._id, Rol },
+            process.env.TOKEN_SECRET,
+            { expiresIn: 86400 } // 24 horas
+        );
 
-        res.json({ token });
+        res.json({ token, Rol });
     } catch (error) {
         console.error("Error en el login:", error);
         res.status(500).json({ message: "Error en el servidor" });

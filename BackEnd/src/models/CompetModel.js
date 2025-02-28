@@ -7,7 +7,7 @@ const CompetenciaSchema = new schema({
         unique: true
     },
     Fecha:{
-        type: date,
+        type: Date,
         required: true
     },
     Categoria:[{
@@ -19,4 +19,5 @@ const CompetenciaSchema = new schema({
     }
 })
 
-modulo.exports = mongoose.model('Competencias', CompetenciaSchema);
+
+module.exports = mongoose.model('Competencias', CompetenciaSchema);
