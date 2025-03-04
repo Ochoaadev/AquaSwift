@@ -4,6 +4,7 @@ import LandingPage from "./views/LandingPage";
 import AboutUs from "./views/AboutUs";
 import Register from "./views/Register";
 import Login from "./views/Login";
+import UserHome from "./views/User/UserHome";
 
 function App() {
   return (
@@ -16,7 +17,10 @@ function App() {
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
 
-          {/* Rutas protegidas */}
+          {/* Rutas protegidas User*/}
+          <Route path='/userHome' element={<UserHome />} />
+
+           {/* Rutas protegidas Admin*/}
         </Routes>
       </Router>
     </AuthProvider>

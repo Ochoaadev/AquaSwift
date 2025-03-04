@@ -119,7 +119,33 @@ const ActPassword = async (req, res) => {
   }
 };
 
+//Login
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Buscar al usuario por email
+    const user = await Atleta.findOne({ Email: email });
+    if (!user) {
+      return res.status(400).json({ message: 'Email o contraseña incorrectos', status: 400 });
+    }
+
+    // Comparar la contraseña
+    const isMatch = await Atleta.comparePassword(password, user.Contrasena);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Email o contraseña incorrectos', status: 400 });
+    }
+
+    // Si todo está bien, devolver éxito
+    res.status(200).json({ message: 'Inicio de sesión exitoso', status: 200, user });
+  } catch (error) {
+    console.error('Error en el login:', error);
+    res.status(500).json({ message: 'Error en el servidor', status: 500 });
+  }
+};
+
 module.exports = { 
+    loginUser,
     Obten_User, 
     Eliminar_User,
     Edit_User,

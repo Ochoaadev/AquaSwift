@@ -1,299 +1,251 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { useState } from "react";
-import { Link } from 'react-router-dom';
-import { useAuth } from "../contexts/AuthProvider";
-import { api } from "../service/apiService";
-import { toast } from "react-hot-toast";
-import { motion } from "framer-motion";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Register() {
-  const { login } = useAuth();
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+const Register = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    gender: "",
-    cedula: "",
-    birthDate: ""
+    nombreApellido: '',
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    dni: '',
+    genero: '',
+    fechaNacimiento: ''
   });
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validateCedula = (cedula) => {
-    const cedulaRegex = /^[0-9]{8,10}$/;
-    return cedulaRegex.test(cedula);
-  };
-
-  const validateField = (name, value) => {
-    const newErrors = { ...errors };
-
-    switch (name) {
-      case "fullName":
-        if (!value) {
-          newErrors.fullName = "El nombre completo es requerido";
-        } else if (value.length < 3) {
-          newErrors.fullName = "El nombre debe tener al menos 3 caracteres";
-        } else {
-          delete newErrors.fullName;
-        }
-        break;
-      case "email":
-        if (!value) {
-          newErrors.email = "El email es requerido";
-        } else if (!validateEmail(value)) {
-          newErrors.email = "Email inválido";
-        } else {
-          delete newErrors.email;
-        }
-        break;
-      case "password":
-        if (!value) {
-          newErrors.password = "La contraseña es requerida";
-        } else if (value.length < 6) {
-          newErrors.password = "La contraseña debe tener al menos 6 caracteres";
-        } else {
-          delete newErrors.password;
-        }
-        if (formData.confirmPassword && value !== formData.confirmPassword) {
-          newErrors.confirmPassword = "Las contraseñas no coinciden";
-        } else {
-          delete newErrors.confirmPassword;
-        }
-        break;
-      case "confirmPassword":
-        if (!value) {
-          newErrors.confirmPassword = "Confirmar contraseña es requerido";
-        } else if (value !== formData.password) {
-          newErrors.confirmPassword = "Las contraseñas no coinciden";
-        } else {
-          delete newErrors.confirmPassword;
-        }
-        break;
-      case "gender":
-        if (!value) {
-          newErrors.gender = "El género es requerido";
-        } else {
-          delete newErrors.gender;
-        }
-        break;
-      case "cedula":
-        if (!value) {
-          newErrors.cedula = "La cédula es requerida";
-        } else if (!validateCedula(value)) {
-          newErrors.cedula = "Cédula inválida";
-        } else {
-          delete newErrors.cedula;
-        }
-        break;
-      case "birthDate":
-        if (!value) {
-          newErrors.birthDate = "La fecha de nacimiento es requerida";
-        } else {
-          const date = new Date(value);
-          const today = new Date();
-          if (date > today) {
-            newErrors.birthDate = "La fecha no puede ser futura";
-          } else {
-            delete newErrors.birthDate;
-          }
-        }
-        break;
-      default:
-        break;
-    }
-
-    setErrors(newErrors);
-  };
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.nombreApellido) newErrors.nombreApellido = 'Nombre y Apellido es requerido';
+    if (!formData.username) newErrors.username = 'Username es requerido';
+    if (!formData.email) newErrors.email = 'Email es requerido';
+    if (!formData.password) newErrors.password = 'Contraseña es requerida';
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (!formData.dni) newErrors.dni = 'DNI es requerido';
+    if (!formData.genero) newErrors.genero = 'Género es requerido';
+    if (!formData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de Nacimiento es requerida';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
 
-    Object.keys(formData).forEach((key) => {
-      validateField(key, formData[key]);
-    });
+    try {
+      const response = await axios.post('http://localhost:4000/api/registro', {
+        Nombre_Apellido: formData.nombreApellido,
+        Username: formData.username,
+        Email: formData.email,
+        Contrasena: formData.password,
+        DNI: formData.dni,
+        Genero: formData.genero,
+        Fecha_Nacimiento: formData.fechaNacimiento
+      });
 
-    // si no hay errores enviar el registro al backend.
-    if (Object.keys(errors).length === 0) {
-      try {
-        console.log("Datos enviados:", formData);
-        const response = await api.auth.register(formData);
-        login(response.user);
-        toast.success(response.message);
-        //despuess del registro exitoso redirigir a la pagina principal.
-      } catch (error) {
-        console.log("Error al enviar:", error);
-        toast.error(error?.response?.data?.message || "Error en el registro", {
-          position: "bottom-right"
-        });
+      if (response.status === 200) {
+        navigate('/login');
       }
+    } catch (error) {
+      console.error('Error al registrar:', error);
+      setErrors({ submit: 'Error al registrar el usuario' });
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   return (
-    <div className='min-h-screen flex flex-col'>
-      <Header />
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className='flex-grow flex items-center justify-center px-4 py-8'
-      >
-        <div className='w-full max-w-md p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
-          <h1 className='text-3xl font-bold text-center text-white mb-6'>
-            Registrate con <span className='text-[#BEB5F9]'>nosotros!</span>
-          </h1>
+    <>
+    <Header />
 
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            <div>
-              <input
-                type='text'
-                name='fullName'
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder='Nombre y Apellido'
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.fullName && (
-                <div className='text-red-300 text-sm mt-1'>
-                  {errors.fullName}
-                </div>
-              )}
+    <div className='mx-auto w-full max-w-md p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA] mt-8'>
+      <h1 className='text-3xl font-bold text-center text-white mb-6 '>
+        Registrate con <span className='text-[#BEB5F9]'>nosotros!</span>
+      </h1>
+
+      <form onSubmit={handleSubmit} className='space-y-4'>
+        {/* Nombre y Apellido */}
+        <div>
+          <input
+            type='text'
+            name='nombreApellido'
+            value={formData.nombreApellido}
+            onChange={handleChange}
+            placeholder='Nombre y Apellido'
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.nombreApellido && (
+            <div className='text-red-300 text-sm mt-1'>
+              {errors.nombreApellido}
             </div>
-
-            <div>
-              <input
-                type='email'
-                name='email'
-                value={formData.email}
-                onChange={handleChange}
-                placeholder='Email'
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.email && (
-                <div className='text-red-300 text-sm mt-1'>{errors.email}</div>
-              )}
-            </div>
-
-            <div>
-              <input
-                type='password'
-                name='password'
-                value={formData.password}
-                onChange={handleChange}
-                placeholder='Contraseña'
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.password && (
-                <div className='text-red-300 text-sm mt-1'>
-                  {errors.password}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <input
-                type='password'
-                name='confirmPassword'
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder='Confirmar Contraseña'
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.confirmPassword && (
-                <div className='text-red-300 text-sm mt-1'>
-                  {errors.confirmPassword}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <input
-                type='text'
-                name='gender'
-                value={formData.gender}
-                onChange={handleChange}
-                placeholder='Género'
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.gender && (
-                <div className='text-red-300 text-sm mt-1'>{errors.gender}</div>
-              )}
-            </div>
-
-            <div>
-              <input
-                type='text'
-                name='cedula'
-                value={formData.cedula}
-                onChange={handleChange}
-                placeholder='Cédula'
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.cedula && (
-                <div className='text-red-300 text-sm mt-1'>{errors.cedula}</div>
-              )}
-            </div>
-
-            <div>
-              <input
-                type='date'
-                name='birthDate'
-                value={formData.birthDate}
-                onChange={handleChange}
-                style={{ background: "transparent" }}
-                className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-              />
-              {errors.birthDate && (
-                <div className='text-red-300 text-sm mt-1'>
-                  {errors.birthDate}
-                </div>
-              )}
-            </div>
-
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors disabled:opacity-70'
-            >
-              {isSubmitting ? "Registrando..." : "Registrarme"}
-            </button>
-          </form>
-
-          <div className='mt-6 flex justify-between'>
-            <span className='text-white'>Ya tienes una cuenta?</span>
-            <Link
-              to='/login'
-              className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70'
-            >
-              Inicia Sesión
-            </Link>
-          </div>
+          )}
         </div>
-      </motion.div>
-      <Footer />
+
+        {/* Username */}
+        <div>
+          <input
+            type='text'
+            name='username'
+            value={formData.username}
+            onChange={handleChange}
+            placeholder='Username'
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.username && (
+            <div className='text-red-300 text-sm mt-1'>
+              {errors.username}
+            </div>
+          )}
+        </div>
+
+        {/* Email */}
+        <div>
+          <input
+            type='email'
+            name='email'
+            value={formData.email}
+            onChange={handleChange}
+            placeholder='Email'
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.email && (
+            <div className='text-red-300 text-sm mt-1'>{errors.email}</div>
+          )}
+        </div>
+
+        {/* Contraseña */}
+        <div>
+          <input
+            type='password'
+            name='password'
+            value={formData.password}
+            onChange={handleChange}
+            placeholder='Contraseña'
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.password && (
+            <div className='text-red-300 text-sm mt-1'>
+              {errors.password}
+            </div>
+          )}
+        </div>
+
+        {/* Confirmar Contraseña */}
+        <div>
+          <input
+            type='password'
+            name='confirmPassword'
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder='Confirmar Contraseña'
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.confirmPassword && (
+            <div className='text-red-300 text-sm mt-1'>
+              {errors.confirmPassword}
+            </div>
+          )}
+        </div>
+
+        {/* DNI */}
+        <div>
+          <input
+            type='number'
+            name='dni'
+            value={formData.dni}
+            onChange={handleChange}
+            placeholder='DNI'
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.dni && (
+            <div className='text-red-300 text-sm mt-1'>{errors.dni}</div>
+          )}
+        </div>
+
+        {/* Género (Select) */}
+        <div>
+          <select
+            name='genero'
+            value={formData.genero}
+            onChange={handleChange}
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          >
+            <option value='' disabled>Selecciona tu género</option>
+            <option value='Masculino'>Masculino</option>
+            <option value='Femenino'>Femenino</option>
+          </select>
+          {errors.genero && (
+            <div className='text-red-300 text-sm mt-1'>{errors.genero}</div>
+          )}
+        </div>
+
+        {/* Fecha de Nacimiento */}
+        <div>
+          <input
+            type='date'
+            name='fechaNacimiento'
+            value={formData.fechaNacimiento}
+            onChange={handleChange}
+            style={{ background: "transparent" }}
+            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+          />
+          {errors.fechaNacimiento && (
+            <div className='text-red-300 text-sm mt-1'>
+              {errors.fechaNacimiento}
+            </div>
+          )}
+        </div>
+
+        {/* Botón de Registro */}
+        <button
+          type='submit'
+          disabled={isSubmitting}
+          className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors disabled:opacity-70'
+        >
+          {isSubmitting ? "Registrando..." : "Registrarme"}
+        </button>
+      </form>
+
+      {/* Enlace a Iniciar Sesión */}
+      <div className='mt-6 flex justify-between'>
+        <span className='text-white'>Ya tienes una cuenta?</span>
+        <Link
+          to='/login'
+          className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70'
+        >
+          Inicia Sesión
+        </Link>
+      </div>
     </div>
+
+    <Footer />
+    </>
   );
-}
+};
+
+export default Register;
