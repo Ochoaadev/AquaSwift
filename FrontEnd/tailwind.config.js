@@ -5,25 +5,36 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
 
-
-  theme: { /* Colores */
-    extend: {},
-    colors: {
-      primary: {
-        0: '#ffffff',
-        100: '#5480E4',
-        200: '#6A92F8',
-        300: '#9BA2F8', 
-        400: '#BEB5F9',
-        450: '#9380BF',
-        500: '#684A85', 
-        600: '#242424',
-        700: '#171717'
+  theme: {
+    extend: {
+      // Aquí agregamos las animaciones personalizadas
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out', // Animación de fade-in
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' }, // Inicia con opacidad 0
+          '100%': { opacity: '1' }, // Termina con opacidad 1
+        },
+      },
+      // Colores personalizados
+      colors: {
+        primary: {
+          0: '#ffffff',
+          100: '#5480E4',
+          200: '#6A92F8',
+          300: '#9BA2F8', 
+          400: '#BEB5F9',
+          450: '#9380BF',
+          500: '#684A85', 
+          600: '#242424',
+          700: '#171717'
+        },
       },
     },
   },
 
-  screens: { // Aquí se definen los breakpoints
+  screens: { // Breakpoints personalizados
     'xxs': '240px', 
     'xs': '480px', 
     'sm': '640px', 
@@ -32,4 +43,4 @@ export default {
     'xl': '1280px', 
     '2xl': '1536px', 
   },
-}
+};

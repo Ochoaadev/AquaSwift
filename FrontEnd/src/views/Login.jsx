@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -21,12 +24,12 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.email) newErrors.email = 'Email es requerido';
-    if (!formData.password) newErrors.password = 'Contraseña es requerida';
+    const errors = {};
+    if (!formData.email) errors.email = true;
+    if (!formData.password) errors.password = true;
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
@@ -55,75 +58,83 @@ const Login = () => {
   };
 
   return (
-    <div className='w-full max-w-md p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
-      <h1 className='text-3xl font-bold text-center text-white mb-2'>
-        Bienvenido
-      </h1>
-      <p className='text-center text-white mb-6'>Ingresa en tu cuenta</p>
+    <>
+      <Header />
 
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        {/* Campo de Email */}
-        <div>
-          <input
-            type='email'
-            name='email'
-            value={formData.email}
-            onChange={handleChange}
-            placeholder='Email'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.email && (
-            <div className='text-red-300 text-sm mt-1'>{errors.email}</div>
-          )}
-        </div>
 
-        {/* Campo de Contraseña */}
-        <div>
-          <input
-            type='password'
-            name='password'
-            value={formData.password}
-            onChange={handleChange}
-            placeholder='Contraseña'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.password && (
-            <div className='text-red-300 text-sm mt-1'>
-              {errors.password}
+      <div className='px-2 w-11/12 mx-auto mt-5'>
+      <div className='mx-auto mt-8 w-full max-w-lg p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
+        <h1 className='text-3xl font-bold text-center text-white mb-2 animate-fade-in'>
+          Bienvenido
+        </h1>
+        <p className='text-center text-white mb-6 animate-fade-in'>Ingresa en tu cuenta</p>
+
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Campo de Email */}
+          <div>
+            <input
+              type='email'
+              name='email'
+              value={formData.email}
+              onChange={handleChange}
+              placeholder={errors.email ? 'Email *' : 'Email'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.email ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.email ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
+
+          {/* Campo de Contraseña */}
+          <div>
+            <input
+              type='password'
+              name='password'
+              value={formData.password}
+              onChange={handleChange}
+              placeholder={errors.password ? 'Contraseña *' : 'Contraseña'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.password ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.password ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
+
+          {/* Mensaje de error general */}
+          {Object.keys(errors).length > 0 && (
+            <div className="text-[#FF0000] text-md text-center font-bold mb-4 animate-fade-in">
+              Todos los campos son requeridos
             </div>
           )}
+
+          {/* Botón de Iniciar Sesión */}
+          <button
+            type='submit'
+            disabled={isSubmitting}
+            className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors duration-300 disabled:opacity-70'
+          >
+            {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
+          </button>
+        </form>
+
+        {/* Enlace a Registro */}
+        <div className='mt-6 flex justify-between'>
+          <span className='text-white'>No tienes una cuenta?</span>
+          <Link
+            to='/register'
+            className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70 transition-colors duration-300'
+          >
+            Regístrate
+          </Link>
         </div>
-
-        {/* Botón de Iniciar Sesión */}
-        <button
-          type='submit'
-          disabled={isSubmitting}
-          className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors disabled:opacity-70'
-        >
-          {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
-        </button>
-      </form>
-
-      {/* Enlace a Registro */}
-      <div className='mt-6 flex justify-between'>
-        <span className='text-white'>No tienes una cuenta?</span>
-        <Link
-          to='/register'
-          className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70'
-        >
-          Regístrate
-        </Link>
       </div>
-
-      {/* Mostrar errores de inicio de sesión */}
-      {errors.submit && (
-        <div className='mt-4 text-red-300 text-sm text-center'>
-          {errors.submit}
-        </div>
-      )}
     </div>
+      <Footer />
+    </>
   );
 };
 

@@ -30,18 +30,18 @@ const Register = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.nombreApellido) newErrors.nombreApellido = 'Nombre y Apellido es requerido';
-    if (!formData.username) newErrors.username = 'Username es requerido';
-    if (!formData.email) newErrors.email = 'Email es requerido';
-    if (!formData.password) newErrors.password = 'Contraseña es requerida';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.dni) newErrors.dni = 'DNI es requerido';
-    if (!formData.genero) newErrors.genero = 'Género es requerido';
-    if (!formData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de Nacimiento es requerida';
+    const errors = {};
+    if (!formData.nombreApellido) errors.nombreApellido = true;
+    if (!formData.username) errors.username = true;
+    if (!formData.email) errors.email = true;
+    if (!formData.password) errors.password = true;
+    if (formData.password !== formData.confirmPassword) errors.confirmPassword = true;
+    if (!formData.dni) errors.dni = true;
+    if (!formData.genero) errors.genero = true;
+    if (!formData.fechaNacimiento) errors.fechaNacimiento = true;
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
@@ -74,176 +74,193 @@ const Register = () => {
 
   return (
     <>
-    <Header />
+      <Header />
 
-    <div className='mx-auto w-full max-w-md p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA] mt-8'>
-      <h1 className='text-3xl font-bold text-center text-white mb-6 '>
-        Registrate con <span className='text-[#BEB5F9]'>nosotros!</span>
-      </h1>
+    <div className='px-2 w-11/12 mx-auto mt-5'>
+      <div className='mx-auto max-w-lg p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA] mt-8'>
+        <h1 className='text-3xl font-bold text-center text-white mb-6 animate-fade-in'>
+          Registrate con <span className='text-[#BEB5F9]'>nosotros!</span>
+        </h1>
 
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        {/* Nombre y Apellido */}
-        <div>
-          <input
-            type='text'
-            name='nombreApellido'
-            value={formData.nombreApellido}
-            onChange={handleChange}
-            placeholder='Nombre y Apellido'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.nombreApellido && (
-            <div className='text-red-300 text-sm mt-1'>
-              {errors.nombreApellido}
-            </div>
-          )}
-        </div>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Nombre y Apellido */}
+          <div className="relative">
+            <input
+              type='text'
+              name='nombreApellido'
+              value={formData.nombreApellido}
+              onChange={handleChange}
+              placeholder={errors.nombreApellido ? 'Nombre y Apellido *' : 'Nombre y Apellido'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.nombreApellido ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.nombreApellido ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
 
-        {/* Username */}
-        <div>
-          <input
-            type='text'
-            name='username'
-            value={formData.username}
-            onChange={handleChange}
-            placeholder='Username'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.username && (
-            <div className='text-red-300 text-sm mt-1'>
-              {errors.username}
-            </div>
-          )}
-        </div>
+          {/* Username */}
+          <div className="relative">
+            <input
+              type='text'
+              name='username'
+              value={formData.username}
+              onChange={handleChange}
+              placeholder={errors.username ? 'Username *' : 'Username'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.username ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.username ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
 
-        {/* Email */}
-        <div>
-          <input
-            type='email'
-            name='email'
-            value={formData.email}
-            onChange={handleChange}
-            placeholder='Email'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.email && (
-            <div className='text-red-300 text-sm mt-1'>{errors.email}</div>
-          )}
-        </div>
+          {/* Email */}
+          <div className="relative">
+            <input
+              type='email'
+              name='email'
+              value={formData.email}
+              onChange={handleChange}
+              placeholder={errors.email ? 'Email *' : 'Email'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.email ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.email ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
 
-        {/* Contraseña */}
-        <div>
-          <input
-            type='password'
-            name='password'
-            value={formData.password}
-            onChange={handleChange}
-            placeholder='Contraseña'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.password && (
-            <div className='text-red-300 text-sm mt-1'>
-              {errors.password}
-            </div>
-          )}
-        </div>
+          {/* Contraseña */}
+          <div className="relative">
+            <input
+              type='password'
+              name='password'
+              value={formData.password}
+              onChange={handleChange}
+              placeholder={errors.password ? 'Contraseña *' : 'Contraseña'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.password ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.password ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
 
-        {/* Confirmar Contraseña */}
-        <div>
-          <input
-            type='password'
-            name='confirmPassword'
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder='Confirmar Contraseña'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.confirmPassword && (
-            <div className='text-red-300 text-sm mt-1'>
-              {errors.confirmPassword}
-            </div>
-          )}
-        </div>
+          {/* Confirmar Contraseña */}
+          <div className="relative">
+            <input
+              type='password'
+              name='confirmPassword'
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder={errors.confirmPassword ? 'Confirmar Contraseña *' : 'Confirmar Contraseña'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.confirmPassword ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.confirmPassword ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
 
-        {/* DNI */}
-        <div>
-          <input
-            type='number'
-            name='dni'
-            value={formData.dni}
-            onChange={handleChange}
-            placeholder='DNI'
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.dni && (
-            <div className='text-red-300 text-sm mt-1'>{errors.dni}</div>
-          )}
-        </div>
+          {/* DNI */}
+          <div className="relative">
+            <input
+              type='number'
+              name='dni'
+              value={formData.dni}
+              onChange={handleChange}
+              placeholder={errors.dni ? 'DNI *' : 'DNI'}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.dni ? 'font-bold' : 'font-medium'
+              } text-[#fff] ${
+                errors.dni ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+              } focus:outline-none focus:scale-105 transition-all duration-300`}
+            />
+          </div>
 
-        {/* Género (Select) */}
-        <div>
+          {/* Género (Select) */}
+          <div className="relative">
           <select
             name='genero'
             value={formData.genero}
             onChange={handleChange}
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
+            className={`
+              w-full py-3 bg-transparent border-b 
+              ${errors.genero ? 'font-bold' : 'font-medium'} 
+              text-[#FFFFFF] focus:outline-none focus:scale-105 transition-all duration-300 
+              ${
+                errors.genero && !formData.genero
+                  ? 'border-[#FF0000] placeholder-[#FF0000]'
+                  : 'border-[#CBD5E1] placeholder-[#CBD5E1]'
+              }
+              sm:text-sm md:text-base lg:text-lg
+            `}
           >
-            <option value='' disabled>Selecciona tu género</option>
-            <option value='Masculino'>Masculino</option>
-            <option value='Femenino'>Femenino</option>
+            <option value='' disabled className='bg-[#FFFFFF] text-[#FFFFFF]'>
+              {errors.genero ? 'Selecciona tu género *' : 'Selecciona tu género'}
+            </option>
+            <option value='Masculino' className='text-[#FFFFFF] bg-primary-100'>
+              Masculino
+            </option>
+            <option value='Femenino' className='text-[#FFFFFF] bg-primary-100'>
+              Femenino
+            </option>
           </select>
-          {errors.genero && (
-            <div className='text-red-300 text-sm mt-1'>{errors.genero}</div>
-          )}
         </div>
 
-        {/* Fecha de Nacimiento */}
-        <div>
-          <input
-            type='date'
-            name='fechaNacimiento'
-            value={formData.fechaNacimiento}
-            onChange={handleChange}
-            style={{ background: "transparent" }}
-            className='w-full py-3 bg-transparent border-b border-white/30 text-[#fff] placeholder-[#CBD5E1] focus:outline-none'
-          />
-          {errors.fechaNacimiento && (
-            <div className='text-red-300 text-sm mt-1'>
-              {errors.fechaNacimiento}
+          {/* Fecha de Nacimiento */}
+          <div className="relative">
+            <input
+              type='date'
+              name='fechaNacimiento'
+              value={formData.fechaNacimiento}
+              onChange={handleChange}
+              style={{ background: "transparent" }}
+              className={`w-full py-3 bg-transparent border-b ${
+                errors.fechaNacimiento ? 'font-bold' : 'font-medium'
+              } text-[#fff] focus:outline-none focus:scale-105 transition-all duration-300 ${
+                errors.fechaNacimiento && !formData.fechaNacimiento ? 'text-[#FF0000]' : 'text-[#CBD5E1]'
+              }`}
+            />
+          </div>
+
+          {/* Mensaje de error general */}
+          {Object.keys(errors).length > 0 && (
+            <div className="text-[#FF0000] text-md text-center font-bold mb-4 animate-fade-in">
+              Todos los campos son requeridos
             </div>
           )}
+
+          {/* Botón de Registro */}
+          <button
+            type='submit'
+            disabled={isSubmitting}
+            className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors duration-300 disabled:opacity-70'
+          >
+            {isSubmitting ? "Registrando..." : "Registrarme"}
+          </button>
+        </form>
+
+        {/* Enlace a Iniciar Sesión */}
+        <div className='mt-6 flex justify-between'>
+          <span className='text-white'>Ya tienes una cuenta?</span>
+          <Link
+            to='/login'
+            className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70 transition-colors duration-300'
+          >
+            Inicia Sesión
+          </Link>
         </div>
-
-        {/* Botón de Registro */}
-        <button
-          type='submit'
-          disabled={isSubmitting}
-          className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors disabled:opacity-70'
-        >
-          {isSubmitting ? "Registrando..." : "Registrarme"}
-        </button>
-      </form>
-
-      {/* Enlace a Iniciar Sesión */}
-      <div className='mt-6 flex justify-between'>
-        <span className='text-white'>Ya tienes una cuenta?</span>
-        <Link
-          to='/login'
-          className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70'
-        >
-          Inicia Sesión
-        </Link>
       </div>
-    </div>
-
-    <Footer />
+      </div>
+<Footer />
     </>
   );
 };
