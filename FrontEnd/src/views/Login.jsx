@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from "../contexts/AuthProvider"
 import { Link, useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const Login = () => {
+  const { signIn } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -40,9 +41,9 @@ const Login = () => {
 
     try {
       // Enviar los datos de inicio de sesión al backend
-      const response = await axios.post('http://localhost:4000/api/login', {
-        email: formData.email,
-        password: formData.password
+       const response = await signIn({
+        Email: formData.email,
+        Contrasena: formData.password
       });
 
       // Si el inicio de sesión es exitoso, redirigir a /userhome

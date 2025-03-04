@@ -43,8 +43,9 @@ exports.signIn = async (req, res) => {
 
         if (!userFound) {
             return res.status(400).json({ message: "El usuario no fue encontrado" });
+            
         }
-
+        console.log(req.body)
         // Verificar contraseña
         const ConfirmarPassword = await bcrypt.compare(Contrasena, userFound.Contrasena || userFound.Contrasena);
         if (!ConfirmarPassword) {

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../contexts/AuthProvider";
 import { Link, useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const Register = () => {
+  const { signUp } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     nombreApellido: '',
     username: '',
@@ -51,19 +52,20 @@ const Register = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/registro', {
+      const response = await signUp({
         Nombre_Apellido: formData.nombreApellido,
         Username: formData.username,
         Email: formData.email,
         Contrasena: formData.password,
         DNI: formData.dni,
         Genero: formData.genero,
-        Fecha_Nacimiento: formData.fechaNacimiento
+        Fecha_Nacimiento: formData.fechaNacimiento,
       });
-
+      
       if (response.status === 200) {
         navigate('/login');
       }
+    
     } catch (error) {
       console.error('Error al registrar:', error);
       setErrors({ submit: 'Error al registrar el usuario' });
