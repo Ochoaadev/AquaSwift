@@ -97,7 +97,7 @@ const Register = () => {
               className={`w-full py-3 bg-transparent border-b ${
                 errors.nombreApellido ? 'font-bold' : 'font-medium'
               } text-[#fff] ${
-                errors.nombreApellido ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+                errors.nombreApellido ? 'border-[#FF0000] border-b-2' : 'border-[#CBD5E1]'
               } focus:outline-none focus:scale-105 transition-all duration-300`}
             />
           </div>
@@ -114,7 +114,7 @@ const Register = () => {
               className={`w-full py-3 bg-transparent border-b ${
                 errors.username ? 'font-bold' : 'font-medium'
               } text-[#fff] ${
-                errors.username ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+                errors.username ? 'border-[#FF0000] border-b-2' : 'border-[#CBD5E1]'
               } focus:outline-none focus:scale-105 transition-all duration-300`}
             />
           </div>
@@ -131,7 +131,7 @@ const Register = () => {
               className={`w-full py-3 bg-transparent border-b ${
                 errors.email ? 'font-bold' : 'font-medium'
               } text-[#fff] ${
-                errors.email ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+                errors.email ? 'border-[#FF0000]  border-b-2' : 'border-[#CBD5E1]'
               } focus:outline-none focus:scale-105 transition-all duration-300`}
             />
           </div>
@@ -148,7 +148,7 @@ const Register = () => {
               className={`w-full py-3 bg-transparent border-b ${
                 errors.password ? 'font-bold' : 'font-medium'
               } text-[#fff] ${
-                errors.password ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+                errors.password ? 'border-[#FF0000] border-b-2' : 'border-[#CBD5E1]'
               } focus:outline-none focus:scale-105 transition-all duration-300`}
             />
           </div>
@@ -165,7 +165,7 @@ const Register = () => {
               className={`w-full py-3 bg-transparent border-b ${
                 errors.confirmPassword ? 'font-bold' : 'font-medium'
               } text-[#fff] ${
-                errors.confirmPassword ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+                errors.confirmPassword ? 'border-[#FF0000] border-b-2' : 'border-[#CBD5E1]'
               } focus:outline-none focus:scale-105 transition-all duration-300`}
             />
           </div>
@@ -182,7 +182,7 @@ const Register = () => {
               className={`w-full py-3 bg-transparent border-b ${
                 errors.dni ? 'font-bold' : 'font-medium'
               } text-[#fff] ${
-                errors.dni ? 'placeholder-[#FF0000]' : 'placeholder-[#CBD5E1]'
+                errors.dni ? 'border-[#FF0000] border-b-2' : 'border-[#CBD5E1]'
               } focus:outline-none focus:scale-105 transition-all duration-300`}
             />
           </div>
@@ -199,8 +199,8 @@ const Register = () => {
               text-[#FFFFFF] focus:outline-none focus:scale-105 transition-all duration-300 
               ${
                 errors.genero && !formData.genero
-                  ? 'border-[#FF0000] placeholder-[#FF0000]'
-                  : 'border-[#CBD5E1] placeholder-[#CBD5E1]'
+                  ? 'border-[#FF0000] border-b-2'
+                  : 'border-[#CBD5E1]'
               }
               sm:text-sm md:text-base lg:text-lg
             `}
@@ -216,22 +216,22 @@ const Register = () => {
             </option>
           </select>
         </div>
-
+         
           {/* Fecha de Nacimiento */}
           <div className="relative">
-            <input
-              type='date'
-              name='fechaNacimiento'
-              value={formData.fechaNacimiento}
-              onChange={handleChange}
-              style={{ background: "transparent" }}
-              className={`w-full py-3 bg-transparent border-b ${
-                errors.fechaNacimiento ? 'font-bold' : 'font-medium'
-              } text-[#fff] focus:outline-none focus:scale-105 transition-all duration-300 ${
-                errors.fechaNacimiento && !formData.fechaNacimiento ? 'text-[#FF0000]' : 'text-[#CBD5E1]'
-              }`}
-            />
-          </div>
+              <input
+                type='date'
+                name='fechaNacimiento'
+                value={formData.fechaNacimiento}
+                onChange={handleChange}
+                style={{ background: "transparent" }}
+                className={`w-full py-3 bg-transparent border-b ${
+                  errors.fechaNacimiento ? 'border-[#FF0000] border-b-2' : 'border-[#CBD5E1]'
+                } text-[#fff] focus:outline-none ${
+                  errors.fechaNacimiento && !formData.fechaNacimiento ? 'text-[#FF0000]' : 'text-[#CBD5E1]'
+                }`}
+              />
+            </div>
 
           {/* Mensaje de error general */}
           {Object.keys(errors).length > 0 && (
