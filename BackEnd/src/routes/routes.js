@@ -11,9 +11,13 @@ const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, update
 
 //Importación de middlewares a usar
 
-const {ChequeoExistenciaUser} = require('../middlewares/VerifyExistingUser')
+const {ChequeoExistenciaUser, verifySession} = require('../middlewares/VerifyExistingUser')
 
 //Rutas definidas
+
+//Chequear si el usuario está autenticado al cargar la app
+
+router.get('/VerifySession', verifySession)
 
 //Registro - Login - Cierre
 

@@ -1,5 +1,5 @@
 const Atleta = require('../models/AtletaModels');
-
+const Administrador = require('../models/AdminModel')
 
 exports.ChequeoExistenciaUser = async(req, res, next)=>{ 
     try{
@@ -25,3 +25,20 @@ exports.ChequeoExistenciaUser = async(req, res, next)=>{
         }); 
     }
 }
+
+exports.verifySession = async (req, res) => {
+    try {
+        let user = await Atleta.findById(req.userId).select("-Contrasena"); // Excluir contraseña
+        if (!user) {
+            user = await Administrador.findById(req.userId).select("-Contrasena");
+        }
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        res.json({ user, Rol: req.userRol });
+    } catch (error) {
+        res.status(500).json({ message: "Error al verificar sesión" });
+    }
+};
