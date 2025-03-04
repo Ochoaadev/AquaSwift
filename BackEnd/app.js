@@ -5,7 +5,6 @@ const logger = require("morgan");
 const cors = require("cors");
 const dbconnection = require("./src/config/Conexion");
 const routes = require("./src/routes/routes");
-const authRouter = require("./src/routes/auth");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 

@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 require('dotenv')
 
 exports.signUp = async (req, res) =>{
-    const {Nombre_Apellido, Username, Email, Contrasena, DNI, Fecha_Nacimiento} = req.body;
+    const {Nombre_Apellido, Username, Email, Contrasena, DNI, Genero, Fecha_Nacimiento} = req.body;
 
     const newUser = new Atleta({
         Nombre_Apellido,
@@ -14,6 +14,7 @@ exports.signUp = async (req, res) =>{
         Contrasena: await Atleta.encryptPassword(Contrasena),
         DNI,
         Rol: "Usuario",
+        Genero,
         Fecha_Nacimiento
     })
 
@@ -64,5 +65,14 @@ exports.signIn = async (req, res) => {
     } catch (error) {
         console.error("Error en el login:", error);
         res.status(500).json({ message: "Error en el servidor" });
+    }
+};
+
+exports.logout = (req, res) => {
+    try {
+        res.status(200).json({ message: "Sesión cerrada correctamente" });
+    } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+        res.status(500).json({ message: "Error al cerrar sesión" });
     }
 };

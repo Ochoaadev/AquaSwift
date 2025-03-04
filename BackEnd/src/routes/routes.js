@@ -5,22 +5,26 @@ const router = express.Router();
 
 const { createAdministrador, deleteAdministrador, getAdministradores } = require('../controllers/adminController');
 const { Obten_User, Eliminar_User, Edit_User, ActPassword, Listar_Users } = require('../controllers/AtletaController');
-const {signIn, signUp} = require('../controllers/User/Login-register')
+const {signIn, signUp, logout} = require('../controllers/User/Login-register')
 const {CreateCompet, DeleteCompet, UpdateCompet, getAllCompet, getByIdCompet} = require('../controllers/CompetController');
 const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, updateCategoria} = require('../controllers/CategoriaController')
 
 //Importación de middlewares a usar
 
+const {ChequeoExistenciaUser} = require('../middlewares/VerifyExistingUser')
 
 //Rutas definidas
 
-//Login - Logout
+//Registro - Login - Cierre
 
 // Ruta para registrarse
-router.post('/registro', signUp);
+router.post('/registro', ChequeoExistenciaUser, signUp);
 
 // Ruta para iniciar sesión
 router.post('/login', signIn);
+
+//Ruta para cierre de sesión
+router.post("/logout", logout); 
 
 //Administrador
 

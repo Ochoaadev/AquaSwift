@@ -29,6 +29,10 @@ const AtletaSchema = new schema({
     Rol:{
         type: String
     },
+    Genero:{
+        type: String,
+        required:true
+    },
     Fecha_Nacimiento:{
         type: Date,
         required: true
