@@ -48,8 +48,7 @@ const Login = () => {
 
       // Si el inicio de sesión es exitoso, redirigir a /userhome
       if (response.status === 200) {
-        localStorage.setItem("token", JSON.stringify(response.data)); // se debe guardar la respuesta en el localStorage ya que al momento de cerrar sesion se limpia la key 'token'.
-        navigate("/userHome");
+        navigate('/userHome');
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
