@@ -5,6 +5,7 @@ import AboutUs from "./views/AboutUs";
 import Register from "./views/Register";
 import Login from "./views/Login";
 import UserHome from "./views/User/UserHome";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -18,9 +19,17 @@ function App() {
           <Route path='/login' element={<Login />} />
 
           {/* Rutas protegidas User*/}
-          <Route path='/userHome' element={<UserHome />} />
+          <Route
+            path='/userHome'
+            element={
+              <PrivateRoute>
+                <UserHome />
+              </PrivateRoute>
+            }
+          />
 
-           {/* Rutas protegidas Admin*/}
+          {/* Rutas protegidas Admin*/}
+          {/* Para las rutas de administrador usar la misma estructura que las protedigas de usuario, solo que al componente 'PrivateRoute' se le debe pasar la propiedad 'adminOnly' en true */}
         </Routes>
       </Router>
     </AuthProvider>
