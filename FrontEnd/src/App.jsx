@@ -1,37 +1,70 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthProvider";
+import { AnimatePresence } from "framer-motion";
+import PageTransition from "./service/PageTransition";
+
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+
+//Free
 import LandingPage from "./views/LandingPage";
 import AboutUs from "./views/AboutUs";
 import Register from "./views/Register";
 import Login from "./views/Login";
-import UserHome from "./views/User/UserHome";
-import AdminHome from "./views/Admin/AdminHome";
 
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+//Usuario
+import UserHome from "./views/User/UserHome";
+import MisCompetencias from "./views/User/MisCompetencias";
+import Perfil from "./views/User/Perfil";
+
+//Admin
+import AdminHome from "./views/Admin/AdminHome";
+import Acuatlon from "./views/Admin/Acuatlon";
+import Natacion from "./views/Admin/Natacion";
+import Triatlon from "./views/Admin/Triatlon";
+import Usuarios from "./views/Admin/AdminUsuarios";
+import Resultados from "./views/Admin/Resultados";
+
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Header />
-        <Routes>
-          {/* Rutas publicas */}
-          <Route path='/' element={<LandingPage />} />
-          <Route path='/AboutUs' element={<AboutUs />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/login' element={<Login />} />
-
-          {/* Rutas protegidas User*/}
-          <Route path='/userHome' element={<UserHome />} />
-
-           {/* Rutas protegidas Admin*/}
-           <Route path='/adminHome' element={<AdminHome />} />
-        </Routes>
+        <AnimatedRoutes />
         <Footer />
       </Router>
     </AuthProvider>
   );
 }
 
-export default App
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Rutas públicas */}
+        <Route path='/' element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path='/AboutUs' element={<PageTransition><AboutUs /></PageTransition>} />
+        <Route path='/register' element={<PageTransition><Register /></PageTransition>} />
+        <Route path='/login' element={<PageTransition><Login /></PageTransition>} />
+
+        {/* Rutas protegidas User */}
+        <Route path='/userHome' element={<PageTransition><UserHome /></PageTransition>} />
+        <Route path='/misCompetencias' element={<PageTransition><MisCompetencias /></PageTransition>} />
+        <Route path='/perfil' element={<PageTransition><Perfil /></PageTransition>} />
+
+        {/* Rutas protegidas Admin */}
+        <Route path='/adminHome' element={<PageTransition><AdminHome /></PageTransition>} />
+        <Route path='/natacion' element={<PageTransition><Natacion /></PageTransition>} />
+        <Route path='/triatlon' element={<PageTransition><Triatlon /></PageTransition>} />
+        <Route path='/acuatlon' element={<PageTransition><Acuatlon /></PageTransition>} />
+        <Route path='/usuarios' element={<PageTransition><Usuarios /></PageTransition>} />
+        <Route path='/resultados' element={<PageTransition><Resultados /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+export default App;

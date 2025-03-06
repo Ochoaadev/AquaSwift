@@ -13,7 +13,7 @@ const routes = {
   ],
   Usuario: [
     { name: "Home", path: "/userHome" },
-    { name: "Mis Competencias", path: "/mis-competencias" },
+    { name: "Mis Competencias", path: "/misCompetencias" },
     { name: "Perfil", path: "/perfil" },
     { name: "Logout", path: "/logout" },
   ],
