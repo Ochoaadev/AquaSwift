@@ -2,9 +2,6 @@ import React, { useState, useContext } from "react";
 import { AuthContext } from "../contexts/AuthProvider";
 import { Link, useNavigate } from 'react-router-dom';
 
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-
 const Register = () => {
   const { signUp } = useContext(AuthContext);
   const [formData, setFormData] = useState({
@@ -75,9 +72,6 @@ const Register = () => {
   };
 
   return (
-    <>
-      <Header />
-
     <div className='px-2 w-11/12 mx-auto mt-5'>
       <div className='mx-auto max-w-lg p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA] mt-8'>
         <h1 className='text-3xl font-bold text-center text-white mb-6 animate-fade-in'>
@@ -262,8 +256,6 @@ const Register = () => {
         </div>
       </div>
       </div>
-<Footer />
-    </>
   );
 };
 

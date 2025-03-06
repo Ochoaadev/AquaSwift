@@ -79,11 +79,14 @@ export const AuthProvider = ({ children }) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(credentials),
         });
-  
+    
         const data = await response.json();
-  
+    
         if (response.ok) {
-          setUser(data.user);
+          setUser({
+            ...data.user,    // Puede incluir los datos de usuario si lo necesitas
+            role: data.Rol   // Guardamos el rol aquí
+          });
           return { status: response.status, data };
         } else {
           return { status: response.status, data };
@@ -93,6 +96,7 @@ export const AuthProvider = ({ children }) => {
         return { status: 500, data: { message: 'Error de servidor' } };
       }
     };
+    
 
     const logout = async () => {
         try {

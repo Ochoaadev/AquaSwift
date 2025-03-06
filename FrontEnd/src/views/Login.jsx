@@ -2,9 +2,6 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from "../contexts/AuthProvider"
 import { Link, useNavigate } from 'react-router-dom';
 
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-
 const Login = () => {
   const { signIn } = useContext(AuthContext);
   const [formData, setFormData] = useState({
@@ -36,19 +33,27 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     setIsSubmitting(true);
-
+  
     try {
-      // Enviar los datos de inicio de sesión al backend
-       const response = await signIn({
+      const response = await signIn({
         Email: formData.email,
         Contrasena: formData.password
       });
-
-      // Si el inicio de sesión es exitoso, redirigir a /userhome
+  
       if (response.status === 200) {
-        navigate('/userHome');
+        localStorage.setItem('token', response.data.token);
+  
+        // Verifica la respuesta para asegurarte que contiene el rol
+        const userRole = response.data.Rol;
+  
+        // Dependiendo del rol, rediriges a una ruta diferente
+        if (userRole === 'Admin') {
+          navigate('/adminHome');
+        } else if (userRole === 'Usuario') {
+          navigate('/userHome');
+        } 
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
@@ -57,11 +62,10 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
+  
+  
 
   return (
-    <>
-      <Header />
-
 
       <div className='px-2 w-11/12 mx-auto mt-5'>
       <div className='mx-auto mt-8 w-full max-w-lg p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
@@ -134,8 +138,6 @@ const Login = () => {
         </div>
       </div>
     </div>
-      <Footer />
-    </>
   );
 };
 

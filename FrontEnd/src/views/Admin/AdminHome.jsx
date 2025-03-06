@@ -1,11 +1,11 @@
 import React from 'react'
 
-function UserHome() {
+function AdminHome() {
   return (
     <>
 
     <div>
-      <h1>User Home</h1>
+      <h1>Admin Home</h1>
     </div>
 
 
@@ -13,4 +13,4 @@ function UserHome() {
   )
 }
 
-export default UserHome
+export default AdminHome

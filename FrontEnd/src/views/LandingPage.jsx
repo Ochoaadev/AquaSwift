@@ -1,14 +1,10 @@
 import { Link } from "react-router-dom";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
 import Banner from "/bannerNata.jpg";
 import Acuatlon from "/Acuatlon.png";
 import Ironman from "/ironman.png";
 
 export default function LandingPage() {
   return (
-    <>
-      <Header />
 
       <div className='px-5 w-11/12 mx-auto mt-5 '>
         <div className='flex justify-center items-center text-center w-full font-bold poppins my-4'>
@@ -76,8 +72,5 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </>
   );
 }

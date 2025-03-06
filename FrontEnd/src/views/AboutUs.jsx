@@ -1,19 +1,15 @@
 import React from 'react'
 
-import Footer from "../components/Footer"
-import Header from "../components/Header"
-
 import Natacion from "/natacion.jpg";
 import Triatlon from "/Triatlon.jpg";
 import adolfo from "/adolfo.jpeg";
 import elias from "/elias.jpeg";
-import esteban from "/esteban.jpeg";
+import Yerson from "/Yerson.jpeg";
 import juan from "/juan.png";
 
 function AboutUs() {
   return (
     <>
-    <Header/>
     
     <div className="flex justify-center items-center text-center w-full font-bold poppins my-5">
       <h1 className="text-4xl lg:text-5xl md:text-4xl sm:text-4xl xs:text-4xl">
@@ -26,11 +22,11 @@ function AboutUs() {
     
     {/* Juan Alvarez */}
     <div>
-      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-full group">
         <img
           src={juan}
           alt="Juan Alvarez"
-          className="rounded-2xl"
+          className="rounded-full"
         />
         <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
           <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -46,11 +42,11 @@ function AboutUs() {
 
     {/* Adolfo Ochoa */}
     <div>
-      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-full group">
         <img
           src={adolfo}
           alt="Adolfo Ochoa"
-          className="rounded-2xl"
+          className="rounded-full"
         />
         <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
           <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -66,11 +62,11 @@ function AboutUs() {
 
     {/* Elias Guillen */}
     <div>
-      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-full group">
         <img
           src={elias}
           alt="Elias Guillen"
-          className="rounded-2xl"
+          className="rounded-full"
         />
         <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
           <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -84,22 +80,22 @@ function AboutUs() {
       </div>
     </div>
 
-    {/* Esteban Eli */}
+    {/* Yerson */}
     <div>
-      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-2xl group">
+      <div className="relative overflow-hidden transition hover:scale-105 duration-200 rounded-full group">
         <img
-          src={esteban}
-          alt="Esteban Eli"
-          className="rounded-2xl"
+          src={Yerson}
+          alt="Yerson Gonzalez"
+          className="rounded-full"
         />
         <div className="absolute inset-0 flex items-end justify-center p-4 bg-primary-500 bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200">
           <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            Esteban Eli
+          Yerson Gonzalez
           </span>
         </div>
       </div>
       <div className='grid justify-center items-center text-center poppins text-2xl font-bold mt-2'>
-        <h1 className='text-primary-400'>CEO</h1>
+        <h1 className='text-primary-400'>Director</h1>
         <h1>Fundador</h1>
       </div>
     </div>
@@ -157,7 +153,6 @@ function AboutUs() {
         </h1>
     </div>
 
-    <Footer/>
     </>
   )
 }

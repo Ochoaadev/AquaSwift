@@ -5,11 +5,16 @@ import AboutUs from "./views/AboutUs";
 import Register from "./views/Register";
 import Login from "./views/Login";
 import UserHome from "./views/User/UserHome";
+import AdminHome from "./views/Admin/AdminHome";
+
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <Header />
         <Routes>
           {/* Rutas publicas */}
           <Route path='/' element={<LandingPage />} />
@@ -21,7 +26,9 @@ function App() {
           <Route path='/userHome' element={<UserHome />} />
 
            {/* Rutas protegidas Admin*/}
+           <Route path='/adminHome' element={<AdminHome />} />
         </Routes>
+        <Footer />
       </Router>
     </AuthProvider>
   );
