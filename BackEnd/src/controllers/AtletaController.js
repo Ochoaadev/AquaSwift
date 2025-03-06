@@ -58,8 +58,6 @@ const Eliminar_User = async (req, res) => {
   }
 };
 
-//Editar usuario
-
 const Edit_User = async (req, res) => {
   try {
     let user = await Atleta.findById(req.params.id);
@@ -67,21 +65,26 @@ const Edit_User = async (req, res) => {
     if (!user) {
       return res.status(404).json({ msg: "Usuario no encontrado" });
     }
+
+    // Verificar los datos que se están enviando antes de actualizar
+    console.log(req.body); // Agregar un console log para ver qué datos estás recibiendo
+
+    // Actualizar los campos del usuario
     user.Nombre_Apellido = req.body.Nombre_Apellido;
     user.Username = req.body.Username;
     user.Email = req.body.Email;
-    user.Contrasena = req.body.Contrasena;
     user.DNI = req.body.DNI;
     user.Fecha_Nacimiento = req.body.Fecha_Nacimiento;
 
-    await user.save();
+    await user.save(); // Guardar los cambios
 
-    res.status(200).json({ msg: "Usuario Actualizado Correctamente", status:200 });
+    res.status(200).json({ msg: "Usuario Actualizado Correctamente", status: 200 });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Server error",status:500 });
+    console.error(error); // Log para ver el error completo
+    res.status(500).json({ msg: "Server error", status: 500 });
   }
 };
+
 
 //Actualizar Contraseña
 

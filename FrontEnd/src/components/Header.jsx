@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthProvider';
-import { Link, useNavigate, useLocation } from 'react-router-dom'; // Importa useLocation
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import logo from '/logo.png';
 
@@ -30,35 +30,45 @@ const routes = {
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
-  const role = user ? user.role : 'free';
   const navigate = useNavigate();
-  const location = useLocation(); // Obtén la ruta actual
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar el menú
+  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [role, setRole] = useState('free'); // Estado para el rol
+
+  // Leer el rol desde localStorage al cargar la página
+  useEffect(() => {
+    const storedRole = localStorage.getItem('role');
+    if (storedRole) {
+      setRole(storedRole); // Establece el rol desde localStorage
+    } else if (user && user.role) {
+      setRole(user.role); // Si el rol está en el contexto, establece ese rol
+      localStorage.setItem('role', user.role); // Guarda el rol en localStorage
+    }
+  }, [user]); // El efecto se ejecuta cuando el user cambia
 
   const availableRoutes = routes[role] || routes['free'];
 
   const handleLogout = async () => {
     await logout();
+    localStorage.removeItem('role'); // Elimina el rol de localStorage al cerrar sesión
+    setRole('free'); // Establece el rol como 'free' al hacer logout
     navigate('/');
   };
 
-  // Función para alternar el menú
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Función para verificar si una ruta está activa
   const isActive = (path) => {
     if (path === "/") {
-      return location.pathname === "/"; // Solo activo si es exactamente "/"
+      return location.pathname === "/";
     }
-    return location.pathname.startsWith(path); // Para otras rutas
+    return location.pathname.startsWith(path);
   };
 
   return (
     <nav className="bg-primary-500 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
         <div className="lg:pl-6 md:pl-4 sm:-pl-2">
           <img
             src={logo}
@@ -67,7 +77,6 @@ const Header = () => {
           />
         </div>
 
-        {/* Menú para pantallas grandes (lg y md) */}
         <div className="hidden lg:flex space-x-6">
           {availableRoutes.map((route, index) => (
             <Link
@@ -75,22 +84,21 @@ const Header = () => {
               to={route.path}
               className={`poppins text-2xl font-medium transition-colors duration-200 relative group ${
                 isActive(route.path)
-                  ? 'text-primary-400' // Estilo activo
-                  : 'text-white hover:text-primary-400' // Estilo normal
+                  ? 'text-primary-400'
+                  : 'text-white hover:text-primary-400'
               }`}
               onClick={route.name === 'Logout' ? handleLogout : undefined}
             >
               {route.name}
               <span
                 className={`absolute rounded-xl -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-primary-100 to-primary-400 transition-all duration-300 group-hover:w-full ${
-                  isActive(route.path) ? 'w-full' : '' // Subrayado activo
+                  isActive(route.path) ? 'w-full' : ''
                 }`}
               ></span>
             </Link>
           ))}
         </div>
 
-        {/* Botón de menú para pantallas pequeñas (sm) */}
         <button
           onClick={toggleMenu}
           className="lg:hidden text-white focus:outline-none transform transition-transform duration-200"
@@ -112,7 +120,6 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Menú desplegable para pantallas pequeñas (sm) */}
       <div
         className={`lg:hidden overflow-hidden transition-all duration-500 ease-in-out ${
           isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
@@ -125,12 +132,12 @@ const Header = () => {
               to={route.path}
               className={`block poppins text-xl font-medium pl-4 py-2 rounded-xl transition-colors duration-200 hover:pl-6 hover:py-4 ${
                 isActive(route.path)
-                  ? 'text-primary-600 bg-primary-450' // Estilo activo
-                  : 'text-white hover:bg-primary-450' // Estilo normal
+                  ? 'text-primary-600 bg-primary-450'
+                  : 'text-white hover:bg-primary-450'
               }`}
               onClick={() => {
                 if (route.name === 'Logout') handleLogout();
-                toggleMenu(); // Cierra el menú al hacer clic en un enlace
+                toggleMenu();
               }}
             >
               {route.name}

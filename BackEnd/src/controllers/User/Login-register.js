@@ -43,9 +43,8 @@ exports.signIn = async (req, res) => {
 
         if (!userFound) {
             return res.status(400).json({ message: "El usuario no fue encontrado" });
-            
         }
-        console.log(req.body)
+
         // Verificar contraseña
         const ConfirmarPassword = await bcrypt.compare(Contrasena, userFound.Contrasena || userFound.Contrasena);
         if (!ConfirmarPassword) {
@@ -62,12 +61,14 @@ exports.signIn = async (req, res) => {
             { expiresIn: 86400 } // 24 horas
         );
 
-        res.json({ token, Rol });
+        // Retornar el token, el rol y el _id
+        res.json({ token, Rol, _id: userFound._id });
     } catch (error) {
         console.error("Error en el login:", error);
         res.status(500).json({ message: "Error en el servidor" });
     }
 };
+
 
 exports.logout = (req, res) => {
     try {

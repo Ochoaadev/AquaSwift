@@ -7,40 +7,39 @@ export const AuthProvider = ({ children }) => {
     let logoutTimer;
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-
-        if (!token) return;
-
-        const checkAuth = async () => {
-            try {
-                const res = await fetch("http://localhost:4000/api/VerifySession", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                const data = await res.json();
-                if (res.ok) {
-                    setUser(data.user);
-                    startLogoutTimer(); // Iniciar contador de inactividad
-                } else {
-                    if (res.status === 401) {
-                        console.warn("Token expirado, cerrando sesión...");
-                    }
-                    logout();
-                }
-            } catch (error) {
-                console.error("Error verificando sesión:", error);
-                logout();
-            }
-        };
-
-        checkAuth();
-
-        return () => clearTimeout(logoutTimer);
-    }, []);
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("_id"); // Recupera el _id del localStorage
+  
+      if (!token || !userId) return;
+  
+      const checkAuth = async () => {
+          try {
+              const res = await fetch("http://localhost:4000/api/VerifySession", {
+                  method: "GET",
+                  headers: {
+                      "Authorization": `Bearer ${token}`,
+                      "Content-Type": "application/json",
+                  },
+              });
+  
+              const data = await res.json();
+              if (res.ok) {
+                  setUser(data.user);  // Suponiendo que "data.user" contiene el usuario
+                  startLogoutTimer();
+              } else {
+                  logout();
+              }
+          } catch (error) {
+              console.error("Error verificando sesión:", error);
+              logout();
+          }
+      };
+  
+      checkAuth();
+  
+      return () => clearTimeout(logoutTimer);
+  }, []);
+  
 
     const startLogoutTimer = () => {
         clearTimeout(logoutTimer);
@@ -74,28 +73,38 @@ export const AuthProvider = ({ children }) => {
 
     const signIn = async (credentials) => {
       try {
-        const response = await fetch('http://localhost:4000/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(credentials),
-        });
-    
-        const data = await response.json();
-    
-        if (response.ok) {
-          setUser({
-            ...data.user,    // Puede incluir los datos de usuario si lo necesitas
-            role: data.Rol   // Guardamos el rol aquí
+          const response = await fetch('http://localhost:4000/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(credentials),
           });
-          return { status: response.status, data };
-        } else {
-          return { status: response.status, data };
-        }
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+              const { token, Rol, _id } = data; // Obtener _id de la respuesta
+  
+              setUser({
+                  _id,  // Guardamos el _id aquí
+                  role: Rol,
+              });
+  
+              // Guardar el token, rol y _id en localStorage
+              localStorage.setItem('token', token);
+              localStorage.setItem('role', Rol);
+              localStorage.setItem('_id', _id); // Guardamos el _id del usuario
+  
+              return { status: response.status, data };
+          } else {
+              return { status: response.status, data };
+          }
       } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        return { status: 500, data: { message: 'Error de servidor' } };
+          console.error('Error al iniciar sesión:', error);
+          return { status: 500, data: { message: 'Error de servidor' } };
       }
-    };
+  };
+  
+    
     
 
     const logout = async () => {
@@ -110,6 +119,7 @@ export const AuthProvider = ({ children }) => {
             if (res.ok) {
                 setUser(null);
                 localStorage.removeItem("token");
+                localStorage.removeItem("_id");
                 clearTimeout(logoutTimer);
                 console.log("Sesión cerrada correctamente.");
             } else {
