@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react'; // Importa useState
+import React, { useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthProvider';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom'; // Importa useLocation
 
 import logo from '/logo.png';
 
@@ -12,13 +12,13 @@ const routes = {
     { name: "About Us", path: "/AboutUs" },
   ],
   Usuario: [
-    { name: "Home", path: "/" },
+    { name: "Home", path: "/userHome" },
     { name: "Mis Competencias", path: "/mis-competencias" },
     { name: "Perfil", path: "/perfil" },
     { name: "Logout", path: "/logout" },
   ],
   Admin: [
-    { name: "Home", path: "/" },
+    { name: "Home", path: "/adminHome" },
     { name: "Natación", path: "/natacion" },
     { name: "Triatlón", path: "/triatlon" },
     { name: "Acuatlón", path: "/acuatlon" },
@@ -32,6 +32,7 @@ const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const role = user ? user.role : 'free';
   const navigate = useNavigate();
+  const location = useLocation(); // Obtén la ruta actual
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar el menú
 
   const availableRoutes = routes[role] || routes['free'];
@@ -44,6 +45,14 @@ const Header = () => {
   // Función para alternar el menú
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Función para verificar si una ruta está activa
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/"; // Solo activo si es exactamente "/"
+    }
+    return location.pathname.startsWith(path); // Para otras rutas
   };
 
   return (
@@ -64,11 +73,19 @@ const Header = () => {
             <Link
               key={index}
               to={route.path}
-              className="text-white poppins text-2xl font-medium hover:text-primary-400 transition-colors duration-200 relative group"
+              className={`poppins text-2xl font-medium transition-colors duration-200 relative group ${
+                isActive(route.path)
+                  ? 'text-primary-400' // Estilo activo
+                  : 'text-white hover:text-primary-400' // Estilo normal
+              }`}
               onClick={route.name === 'Logout' ? handleLogout : undefined}
             >
               {route.name}
-              <span className="absolute rounded-xl -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-primary-100 to-primary-400 transition-all duration-300 group-hover:w-full"></span>
+              <span
+                className={`absolute rounded-xl -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-primary-100 to-primary-400 transition-all duration-300 group-hover:w-full ${
+                  isActive(route.path) ? 'w-full' : '' // Subrayado activo
+                }`}
+              ></span>
             </Link>
           ))}
         </div>
@@ -106,7 +123,11 @@ const Header = () => {
             <Link
               key={index}
               to={route.path}
-              className="block poppins text-xl font-medium text-white pl-4 py-2 rounded-xl hover:bg-primary-450 transition-colors duration-200 hover:pl-6 hover:py-4"
+              className={`block poppins text-xl font-medium pl-4 py-2 rounded-xl transition-colors duration-200 hover:pl-6 hover:py-4 ${
+                isActive(route.path)
+                  ? 'text-primary-600 bg-primary-450' // Estilo activo
+                  : 'text-white hover:bg-primary-450' // Estilo normal
+              }`}
               onClick={() => {
                 if (route.name === 'Logout') handleLogout();
                 toggleMenu(); // Cierra el menú al hacer clic en un enlace
