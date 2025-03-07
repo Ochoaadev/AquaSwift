@@ -16,6 +16,10 @@ const CompetenciaSchema = new schema({
     }],
     Genero:{
         type:String
+    },
+    Imagen: {
+        public_id: { type: String, required: true },
+        url: { type: String, required: true }
     }
 })
 

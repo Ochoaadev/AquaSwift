@@ -94,7 +94,7 @@ const Header = () => {
                   ? "text-primary-400"
                   : "text-white hover:text-primary-400"
               }`}
-              onClick={route.name === "Logout" ? handleLogout() : undefined}
+              onClick={route.name === "Logout" ? handleLogout: undefined}
             >
               {route.name}
               <span

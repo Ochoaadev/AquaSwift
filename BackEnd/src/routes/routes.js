@@ -12,6 +12,7 @@ const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, update
 //Importación de middlewares a usar
 
 const {ChequeoExistenciaUser, verifySession} = require('../middlewares/VerifyExistingUser')
+const upload = require('../middlewares/multer');
 
 //Rutas definidas
 
@@ -53,8 +54,8 @@ router.put('/usuarios/:id/password', ActPassword);
 
 router.get('/competencias', getAllCompet);
 router.get('/competencias/:id', getByIdCompet);
-router.post('/competencias', CreateCompet);
-router.put('/competencias/:id', UpdateCompet);
+router.post('/competencias', upload.single('Imagen'), CreateCompet);
+router.put('/competencias/:id', upload.single('Imagen'), UpdateCompet);
 router.delete('/competencias/:id', DeleteCompet)
 
 //Categorias
