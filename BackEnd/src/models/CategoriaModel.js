@@ -3,19 +3,20 @@ const schema = mongoose.Schema
 
 const CategoriaSchema = new schema({
     Nombre: {
-        type: String
+        type: String,
+        required: true
     },
     Edad:{
         type: Number,
+        required: true
     },
     Genero:{
-        type: String
+        type: String,
+        required: true
     },
     Modalidad:{
         type: String,
-    },
-    Nivel:{
-        type: String
+        required: true
     }
 })
 
