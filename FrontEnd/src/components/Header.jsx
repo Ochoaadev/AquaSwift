@@ -55,11 +55,11 @@ const Header = () => {
   };
 
   const confirmLogout = async () => {
+    setShowModal(false);
     await logout();
     localStorage.removeItem("role");
     setRole("free");
     navigate("/");
-    setShowModal(false);
   };
 
   const toggleMenu = () => {
@@ -94,7 +94,7 @@ const Header = () => {
                   ? "text-primary-400"
                   : "text-white hover:text-primary-400"
               }`}
-              onClick={route.name === "Logout" ? handleLogout : undefined}
+              onClick={route.name === "Logout" ? handleLogout() : undefined}
             >
               {route.name}
               <span
