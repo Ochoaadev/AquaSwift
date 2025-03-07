@@ -22,7 +22,7 @@ import AdminHome from "./views/Admin/AdminHome";
 import Acuatlon from "./views/Admin/Acuatlon";
 import Natacion from "./views/Admin/Natacion";
 import Triatlon from "./views/Admin/Triatlon";
-import Usuarios from "./views/Admin/AdminUsuarios";
+import AdminUsuarios from "./views/Admin/AdminUsuarios";
 import Resultados from "./views/Admin/Resultados";
 
 
@@ -60,7 +60,7 @@ function AnimatedRoutes() {
         <Route path='/natacion' element={<PageTransition><Natacion /></PageTransition>} />
         <Route path='/triatlon' element={<PageTransition><Triatlon /></PageTransition>} />
         <Route path='/acuatlon' element={<PageTransition><Acuatlon /></PageTransition>} />
-        <Route path='/usuarios' element={<PageTransition><Usuarios /></PageTransition>} />
+        <Route path='/usuarios' element={<PageTransition><AdminUsuarios /></PageTransition>} />
         <Route path='/resultados' element={<PageTransition><Resultados /></PageTransition>} />
       </Routes>
     </AnimatePresence>
