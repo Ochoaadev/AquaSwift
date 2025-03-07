@@ -3,7 +3,7 @@ const router = express.Router();
 
 //Importaciones de rutas
 
-const { createAdministrador, deleteAdministrador, getAdministradores } = require('../controllers/adminController');
+const { createAdministrador, deleteAdministrador, getAdministradores } = require('../controllers/AdminController');
 const { Obten_User, Eliminar_User, Edit_User, ActPassword, Listar_Users} = require('../controllers/AtletaController');
 const {signIn, signUp, logout} = require('../controllers/User/Login-register')
 const {CreateCompet, DeleteCompet, UpdateCompet, getAllCompet, getByIdCompet} = require('../controllers/CompetController');

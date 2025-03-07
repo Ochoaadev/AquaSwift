@@ -31,22 +31,40 @@ exports.signUp = async (req, res) =>{
 
 exports.signIn = async (req, res) => {
     try {
-        const { Email, Contrasena } = req.body;
+        const { Email, Username, Contrasena } = req.body;
 
-        let userFound = await Atleta.findOne({ Email }); // Buscar en Atleta
+        // Validar que se proporcione al menos Email o Username
+        if (!Email && !Username) {
+            return res.status(400).json({ message: "Se requiere Email o Username" });
+        }
+
+        let userFound = null;
         let Rol = "Usuario";
 
+        // Buscar en Atleta por Email o Username
+        if (Email) {
+            userFound = await Atleta.findOne({ Email });
+        } else if (Username) {
+            userFound = await Atleta.findOne({ Username });
+        }
+
+        // Si no se encuentra en Atleta, buscar en Administrador
         if (!userFound) {
-            userFound = await Administrador.findOne({ Email }); // Buscar en Administrador
+            if (Email) {
+                userFound = await Administrador.findOne({ Email });
+            } else if (Username) {
+                userFound = await Administrador.findOne({ Username });
+            }
             Rol = "Admin";
         }
 
+        // Si no se encuentra en ninguna colección
         if (!userFound) {
             return res.status(400).json({ message: "El usuario no fue encontrado" });
         }
 
         // Verificar contraseña
-        const ConfirmarPassword = await bcrypt.compare(Contrasena, userFound.Contrasena || userFound.Contrasena);
+        const ConfirmarPassword = await bcrypt.compare(Contrasena, userFound.Contrasena);
         if (!ConfirmarPassword) {
             return res.status(401).json({
                 token: null,

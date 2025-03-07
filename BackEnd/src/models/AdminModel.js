@@ -11,6 +11,10 @@ const AdminSchema = new schema({
         required: true,
         unique: true
     },
+    Username:{
+        type: String,
+        required: true
+    },
     Contrasena:{
         type:String,
         required: true

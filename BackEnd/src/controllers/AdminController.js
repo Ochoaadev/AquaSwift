@@ -4,10 +4,10 @@ const Administrador = require('../models/AdminModel');
 const CreateAdmin = async (req, res) => {
   try {
     // Extraer campos del cuerpo de la solicitud
-    const { Nombre_Apellido, Email, Contrasena } = req.body;
+    const { Nombre_Apellido, Email, Username ,Contrasena } = req.body;
 
     // Validaciones adicionales
-    if (!Nombre_Apellido || !Email || !Contrasena) {
+    if (!Nombre_Apellido || !Email || !Username || !Contrasena) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -22,6 +22,7 @@ const CreateAdmin = async (req, res) => {
     const nuevoAdministrador = await Administrador.create({
       Nombre_Apellido,
       Email,
+      Username,
       Contrasena: hashedPassword,
       Rol: "Admin"
     });
