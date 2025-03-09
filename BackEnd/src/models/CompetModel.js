@@ -10,6 +10,10 @@ const CompetenciaSchema = new schema({
         type: Date,
         required: true
     },
+    Disciplina:{
+        type: String,
+        unique: true
+    },
     Categoria:[{
         ref: 'Categorias',
         type: schema.Types.ObjectId

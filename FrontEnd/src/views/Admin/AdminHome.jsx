@@ -1,11 +1,13 @@
 import React from 'react'
+import Competencia from './Competencia'
+
 
 function AdminHome() {
   return (
     <>
 
     <div>
-      <h1>Admin Home</h1>
+      <Competencia/>
     </div>
 
 

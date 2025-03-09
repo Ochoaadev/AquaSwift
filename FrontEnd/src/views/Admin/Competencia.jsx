@@ -4,6 +4,7 @@ import { useItemsContext, useUpItemsContext } from "../../contexts/UpProvider";
 const CreateCompetenciaForm = () => {
   const [nombre, setNombre] = useState("");
   const [fecha, setFecha] = useState("");
+  const [disciplina, setDisciplina] = useState("");
   const [categoria, setCategoria] = useState("");
   const [genero, setGenero] = useState("");
   const [Imagen, setImagen] = useState(null);
@@ -21,6 +22,7 @@ const CreateCompetenciaForm = () => {
     const formData = new FormData();
     formData.append("Nombre", nombre);
     formData.append("Fecha", fecha);
+    formData.append("Disciplina", disciplina)
     formData.append("Categoria", categoria);
     formData.append("Genero", genero);
     if (Imagen) {
@@ -43,6 +45,7 @@ const CreateCompetenciaForm = () => {
       // Limpiar el formulario
       setNombre("");
       setFecha("");
+      setDisciplina("");
       setCategoria("");
       setGenero("");
       setImagen(null);
@@ -77,6 +80,15 @@ const CreateCompetenciaForm = () => {
             type="date"
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Disciplina:</label>
+          <input
+            type="text"
+            value={disciplina}
+            onChange={(e) => setDisciplina(e.target.value)}
             required
           />
         </div>
@@ -142,6 +154,7 @@ const CreateCompetenciaForm = () => {
                     .map((cat) => cat.Nombre) // Accede a la propiedad "Nombre" de cada categoría
                     .join(", ")} {/* Convierte el array en un string separado por comas */}
                 </p>
+                <p>Disciplina: {competencia.Disciplina}</p>
                 <p>Género: {competencia.Genero}</p>
             </div>
           ))}

@@ -24,8 +24,8 @@ import Acuatlon from "./views/Admin/Acuatlon";
 import Natacion from "./views/Admin/Natacion";
 import Triatlon from "./views/Admin/Triatlon";
 import AdminUsuarios from "./views/Admin/AdminUsuarios";
-// import Resultados from "./views/Admin/Resultados";
-import Competencia from './views/Admin/Competencia'
+import Resultados from "./views/Admin/Resultados";
+
 
 
 function App() {
@@ -65,8 +65,8 @@ function AnimatedRoutes() {
         <Route path='/triatlon' element={<PageTransition><Triatlon /></PageTransition>} />
         <Route path='/acuatlon' element={<PageTransition><Acuatlon /></PageTransition>} />
         <Route path='/usuarios' element={<PageTransition><AdminUsuarios /></PageTransition>} />
-        {/* <Route path='/resultados' element={<PageTransition><Resultados /></PageTransition>} /> */}
-        <Route path='/competencia' element={<PageTransition><Competencia /></PageTransition>} />
+        <Route path='/resultados' element={<PageTransition><Resultados /></PageTransition>} />
+
       </Routes>
     </AnimatePresence>
   );
