@@ -7,9 +7,9 @@ export default {
 
   theme: {
     extend: {
-      // Aquí agregamos las animaciones personalizadas
+      // Aquí agregamos las animaciones 
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out', // Animación de fade-in
+        'fade-in': 'fadeIn 0.5s ease-in-out', 
       },
       keyframes: {
         fadeIn: {
