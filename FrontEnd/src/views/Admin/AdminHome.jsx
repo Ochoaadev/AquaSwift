@@ -8,6 +8,7 @@ import eliminar from "/eliminar.png";
 const AdminHome = () => {
   const [nombre, setNombre] = useState("");
   const [fecha, setFecha] = useState("");
+  const [disciplina, setDisciplina] = useState("");
   const [categoria, setCategoria] = useState("");
   const [genero, setGenero] = useState("");
   const [Imagen, setImagen] = useState(null);
@@ -25,11 +26,13 @@ const AdminHome = () => {
     const formData = new FormData();
     formData.append("Nombre", nombre);
     formData.append("Fecha", fecha);
+    formData.append("Disciplina", disciplina)
     formData.append("Categoria", categoria);
     formData.append("Genero", genero);
     if (Imagen) {
       formData.append("Imagen", Imagen);
     }
+
 
     try {
       const response = await fetch("http://localhost:4000/api/competencias", {
@@ -47,6 +50,7 @@ const AdminHome = () => {
       // Limpiar el formulario
       setNombre("");
       setFecha("");
+      setDisciplina("");
       setCategoria("");
       setGenero("");
       setImagen(null);
@@ -73,58 +77,67 @@ const AdminHome = () => {
 
 
     <div>
-      {/*<h2>Crear Nueva Competencia</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Nombre:</label>
-          <input
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Fecha:</label>
-          <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Categoría:</label>
-          <input
-            type="text"
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Género:</label>
-          <input
-            type="text"
-            value={genero}
-            onChange={(e) => setGenero(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Imagen:</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImagen(e.target.files[0])}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Creando..." : "Crear Competencia"}
-        </button>
-      </form>*/}
+      {/* <h2>Crear Nueva Competencia</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Nombre:</label>
+            <input
+              type="text"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Fecha:</label>
+            <input
+              type="date"
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Disciplina:</label>
+            <input
+              type="text"
+              value={disciplina}
+              onChange={(e) => setDisciplina(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Categoría:</label>
+            <input
+              type="text"
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Género:</label>
+            <input
+              type="text"
+              value={genero}
+              onChange={(e) => setGenero(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Imagen:</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImagen(e.target.files[0])}
+              required
+            />
+          </div>
+          <button type="submit" disabled={loading}>
+            {loading ? "Creando..." : "Crear Competencia"}
+          </button>
+        </form> */}
       </div>
 
       {/* Listado Horizontal de Competencias */}
@@ -152,6 +165,7 @@ const AdminHome = () => {
                   Categoría:
                   {competencia.Categoria.map((cat) => cat.Nombre).join(", ")}
                 </p>
+                <p>Disciplina: {competencia.Disciplina}</p>
                 <p className="text-sm">Género: {competencia.Genero}</p>
 
                 <div className="flex gap-2 mt-4">
