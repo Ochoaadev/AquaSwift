@@ -20,7 +20,11 @@ const CompetenciaSchema = new schema({
     Imagen: {
         public_id: { type: String, required: true },
         url: { type: String, required: true }
-    }
+    },
+    Atletas: [{
+        ref: 'Atletas', // Referencia al modelo Atleta
+        type: schema.Types.ObjectId
+    }]
 })
 
 

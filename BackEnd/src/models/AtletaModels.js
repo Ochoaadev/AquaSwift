@@ -36,7 +36,11 @@ const AtletaSchema = new schema({
     Fecha_Nacimiento:{
         type: Date,
         required: true
-    }
+    },
+    Competencias: [{
+        ref: 'Competencias',
+        type: schema.Types.ObjectId
+    }]
 })
 
 //Cifrar contraseña

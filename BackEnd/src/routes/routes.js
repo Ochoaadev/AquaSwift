@@ -9,6 +9,11 @@ const {signIn, signUp, logout} = require('../controllers/User/Login-register')
 const {CreateCompet, DeleteCompet, UpdateCompet, getAllCompet, getByIdCompet} = require('../controllers/CompetController');
 const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, updateCategoria} = require('../controllers/CategoriaController')
 
+
+//Filtro de busqueda
+
+const {filtrar} = require('../controllers/Filtro')
+
 //Importación de middlewares a usar
 
 const {ChequeoExistenciaUser, verifySession} = require('../middlewares/VerifyExistingUser')
@@ -65,6 +70,10 @@ router.get('/Categorias/:id', getCategoriaById)
 router.post('/Categorias', createCategoria)
 router.put('/Categorias/:id', updateCategoria)
 router.delete('/Categorias/:id', deleteCategoria)
+
+//Filtro de busqueda
+
+router.get('/Filtrar', filtrar);
 
 
 module.exports = router
