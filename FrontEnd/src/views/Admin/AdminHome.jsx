@@ -2,6 +2,8 @@ import React, { useState, useContext } from "react";
 import { useItemsContext, useUpItemsContext } from "../../contexts/UpProvider"; 
 
 import equipo from "/equipo.png";
+import editar from "/editar.png";
+import eliminar from "/eliminar.png";
 
 const AdminHome = () => {
   const [nombre, setNombre] = useState("");
@@ -126,8 +128,7 @@ const AdminHome = () => {
       </div>
 
       {/* Listado Horizontal de Competencias */}
-      <div className="mt-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
         {items
           .filter((competencia) => competencia.Imagen)
           .map((competencia) => (
@@ -138,10 +139,11 @@ const AdminHome = () => {
               <img
                 src={competencia.Imagen?.url}
                 alt={competencia.Nombre}
-                className="w-6/12 rounded-lg mx-auto"
+                className="h-48 w-68 rounded-lg mx-auto"
               />
 
               <div className="grid justify-center items-center">
+
                 <h4 className="mt-2 text-lg font-semibold">{competencia.Nombre}</h4>
                 <p className="text-sm">
                   Fecha: {new Date(competencia.Fecha).toLocaleDateString()}
@@ -151,11 +153,32 @@ const AdminHome = () => {
                   {competencia.Categoria.map((cat) => cat.Nombre).join(", ")}
                 </p>
                 <p className="text-sm">Género: {competencia.Genero}</p>
+
+                <div className="flex gap-2 mt-4">
+                <button
+                  className="transition lg:text-lg md:text-md text-sm hover:scale-105 duration-200 bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-secondary-50 font-bold py-1 px-3 rounded-xl"
+                >
+                  Mas Info
+                </button>
+
+                <button
+                  className="bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center"
+                >
+                  <img src={eliminar} alt="Eliminar" className="w-5 h-5" /> 
+                </button>
+
+                <button
+                  className="bg-blue-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center"
+                >
+                  <img src={editar} alt="Editar" className="w-5 h-5" />
+                </button>
               </div>
+
+              </div>
+
             </div>
           ))}
       </div>
-    </div>
     </div>
   );
 };
