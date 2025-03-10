@@ -67,7 +67,7 @@ export default function UpProvider({ children }) {
         items, 
       }}
     >
-      <upitemsContext.Provider value={fetchData}>
+      <upitemsContext.Provider value={{ fetchData, setItems }}>
         <SearchContext.Provider value={{ inputSearch, setInputSearch }}>
           {children} {/* Componentes hijos */}
         </SearchContext.Provider>

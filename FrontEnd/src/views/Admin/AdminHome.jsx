@@ -1,197 +1,169 @@
-import React, { useState, useContext } from "react";
-import { useItemsContext, useUpItemsContext } from "../../contexts/UpProvider"; 
-
+import React, { useState } from "react";
+import { useItemsContext, useUpItemsContext } from "../../contexts/UpProvider";
+import { api } from "../../service/apiService";
 import equipo from "/equipo.png";
 import editar from "/editar.png";
 import eliminar from "/eliminar.png";
 
-const AdminHome = () => {
-  const [nombre, setNombre] = useState("");
-  const [fecha, setFecha] = useState("");
-  const [disciplina, setDisciplina] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [genero, setGenero] = useState("");
-  const [Imagen, setImagen] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+import AgregarCompetencia from "../../components/AgregarCompetencia";
 
-  const { items } = useItemsContext(); 
+const AdminHome = () => {
+  const { items } = useItemsContext();
   const { fetchData } = useUpItemsContext();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const formData = new FormData();
-    formData.append("Nombre", nombre);
-    formData.append("Fecha", fecha);
-    formData.append("Disciplina", disciplina)
-    formData.append("Categoria", categoria);
-    formData.append("Genero", genero);
-    if (Imagen) {
-      formData.append("Imagen", Imagen);
-    }
-
-
+  const handleDeleteCompetencia = async (id) => {
     try {
-      const response = await fetch("http://localhost:4000/api/competencias", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al crear la competencia");
-      }
-
-      const data = await response.json();
-      console.log("Competencia creada:", data);
-
-      // Limpiar el formulario
-      setNombre("");
-      setFecha("");
-      setDisciplina("");
-      setCategoria("");
-      setGenero("");
-      setImagen(null);
-
-      // Actualizar la lista de competencias
-      fetchData();
+      await api.competencia.deleteCompetencia(id);
+      await fetchData(); // Actualizar la lista sin recargar
     } catch (error) {
-      console.error("Error:", error);
-      setError("Error al crear la competencia");
-    } finally {
-      setLoading(false);
+      console.error("Error al eliminar la competencia:", error);
     }
   };
 
   return (
-    <div className="p-6 w-5/6 mx-auto poppins">
-
-      <div className="flex items-center">
-            <img src={equipo} alt="Usuario" className="lg:w-1/12 md:w-2/12 w-4/12 mr-4" />
-            <h1 className="lg:text-5xl md:text-5xl text-4xl font-bold  lg:mt-12 md:mt-12 mt-2">
-                Competencias Disponibles
-            </h1>
+    <div className="p-6 md:w-11/12 lg:w-5/6 mx-auto poppins">
+      <div className="flex items-center justify-center">
+        <img src={equipo} alt="equipo" className="lg:w-1/12 md:w-2/12 w-4/12 mr-4" />
+        <h1 className="text-3xl lg:text-5xl font-bold lg:mt-12 mt-7 text-center">Competencias Disponibles</h1>
       </div>
 
+      <AgregarCompetencia/>
 
-    <div>
-      {/* <h2>Crear Nueva Competencia</h2>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Nombre:</label>
+      {["Natacion", "Acuatlon", "Triatlon"].map((disciplina, index) => {
+        const colorClasses = ["text-primary-100", "text-primary-300", "text-primary-400"];
+        const competencias = items.filter((comp) => comp.Disciplina === disciplina);
+
+        return (
+          <div key={disciplina}>
+            <h1 className={`text-4xl mt-5 font-bold ${colorClasses[index]}`}>{disciplina}</h1>
+            <div className="w-8/12 md:w-5/12 lg:w-3/12 h-1 bg-primary-0 mb-5"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4">
+              {competencias.map((competencia) => (
+                <CompetenciaCard
+                  key={competencia._id}
+                  competencia={competencia}
+                  onDelete={() => handleDeleteCompetencia(competencia._id)}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const CompetenciaCard = ({ competencia, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedCompetencia, setEditedCompetencia] = useState({ ...competencia });
+  const { fetchData } = useUpItemsContext(); // Para actualizar después de guardar
+
+  const handleEditClick = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedCompetencia((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveClick = async () => {
+    try {
+      await api.competencia.updateCompetencia(competencia._id, editedCompetencia);
+      await fetchData(); // Refrescar datos para ver los cambios en tiempo real
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error al actualizar la competencia:", error);
+    }
+  };
+
+  const handleCancelClick = () => {
+    setEditedCompetencia({ ...competencia });
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="bg-primary-300 rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5">
+      <img
+        src={competencia.Imagen?.url}
+        alt={competencia.Nombre}
+        className="h-48 w-72 rounded-lg mx-auto lg:mx-0 sm:w-64 md:w-72 lg:w-90 lg:h-56"
+      />
+
+      <div className="grid justify-center items-center -mt-4 md:-mt-4 lg:mt-0">
+        {isEditing ? (
+          <div className="flex flex-col items-center mt-2">
             <input
               type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              required
+              name="Nombre"
+              value={editedCompetencia.Nombre}
+              onChange={handleInputChange}
+              className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
             />
-          </div>
-          <div>
-            <label>Fecha:</label>
             <input
               type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              required
+              name="Fecha"
+              value={editedCompetencia.Fecha}
+              onChange={handleInputChange}
+              className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
             />
-          </div>
-          <div>
-            <label>Disciplina:</label>
             <input
-              type="text"
-              value={disciplina}
-              onChange={(e) => setDisciplina(e.target.value)}
-              required
+              name="Categoria"
+              value={editedCompetencia.Categoria.map((cat) => cat.Nombre).join(", ")}
+              onChange={handleInputChange}
+              className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
             />
-          </div>
-          <div>
-            <label>Categoría:</label>
-            <input
-              type="text"
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label>Género:</label>
-            <input
-              type="text"
-              value={genero}
-              onChange={(e) => setGenero(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label>Imagen:</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImagen(e.target.files[0])}
-              required
-            />
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? "Creando..." : "Crear Competencia"}
-          </button>
-        </form> */}
-      </div>
-
-      {/* Listado Horizontal de Competencias */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
-        {items
-          .filter((competencia) => competencia.Imagen)
-          .map((competencia) => (
-            <div
-              key={competencia._id}
-              className="bg-primary-300 rounded-xl p-5 flex justify-center items-center gap-5" 
+            <select
+              name="Disciplina"
+              value={editedCompetencia.Disciplina}
+              onChange={handleInputChange}
+              className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
             >
-              <img
-                src={competencia.Imagen?.url}
-                alt={competencia.Nombre}
-                className="h-48 w-68 rounded-lg mx-auto"
-              />
-
-              <div className="grid justify-center items-center">
-
-                <h4 className="mt-2 text-lg font-semibold">{competencia.Nombre}</h4>
-                <p className="text-sm">
-                  Fecha: {new Date(competencia.Fecha).toLocaleDateString()}
-                </p>
-                <p className="text-sm">
-                  Categoría:
-                  {competencia.Categoria.map((cat) => cat.Nombre).join(", ")}
-                </p>
-                <p>Disciplina: {competencia.Disciplina}</p>
-                <p className="text-sm">Género: {competencia.Genero}</p>
-
-                <div className="flex gap-2 mt-4">
-                <button
-                  className="transition lg:text-lg md:text-md text-sm hover:scale-105 duration-200 bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-secondary-50 font-bold py-1 px-3 rounded-xl"
-                >
-                  Mas Info
+              <option value="Natacion">Natación</option>
+              <option value="Acuatlon">Acuatlón</option>
+              <option value="Triatlon">Triatlón</option>
+            </select>
+            <select
+              name="Genero"
+              value={editedCompetencia.Genero}
+              onChange={handleInputChange}
+              className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
+            >
+              <option value="Masculino">Masculino</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Mixto">Mixto</option>
+            </select>
+            <div className="flex gap-2 mt-3">
+              <button onClick={handleSaveClick} className="text-center bg-blue-600 text-white font-bold rounded-xl p-2">
+                Guardar
+              </button>
+              <button onClick={handleCancelClick} className="text-center bg-red-600 text-white font-bold rounded-xl p-2">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h4 className="text-2xl font-semibold text-center lg:text-left">{competencia.Nombre}</h4>
+            <p className="text-lg text-center lg:text-left"><span className="font-bold">Fecha: </span>{new Date(competencia.Fecha).toLocaleDateString()}</p>
+            <p className="text-lg text-center lg:text-left"><span className="font-bold">Categoría: </span>{competencia.Categoria.map((cat) => cat.Nombre).join(", ")}</p>
+            <p className="text-lg text-center lg:text-left"><span className="font-bold">Disciplina: </span>{competencia.Disciplina}</p>
+            <p className="text-lg text-center lg:text-left"><span className="font-bold">Género: </span>{competencia.Genero}</p>
+            <div className="grid grid-cols-2 lg:grid-cols-1 lg:justify-start gap-2 mt-2">
+              <button className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl">
+                Más Info
+              </button>
+              <div className="flex gap-3">
+                <button onClick={onDelete} className="w-6/12 bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center">
+                  <img src={eliminar} alt="Eliminar" className="w-5 h-5" />
                 </button>
-
-                <button
-                  className="bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center"
-                >
-                  <img src={eliminar} alt="Eliminar" className="w-5 h-5" /> 
-                </button>
-
-                <button
-                  className="bg-blue-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center"
-                >
+                <button onClick={handleEditClick} className="w-6/12 bg-blue-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center">
                   <img src={editar} alt="Editar" className="w-5 h-5" />
                 </button>
               </div>
-
-              </div>
-
             </div>
-          ))}
+          </div>
+        )}
       </div>
     </div>
   );

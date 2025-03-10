@@ -135,7 +135,7 @@ const UpdateCompet = async (req, res) => {
     }
 }
 
-// Eliminar competencia (modificado)
+// Eliminar competencia 
 const DeleteCompet = async (req, res) => {
     try {
         const competencia = await Competencia.findById(req.params.id);
