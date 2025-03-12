@@ -12,7 +12,6 @@ const CompetenciaSchema = new schema({
     },
     Disciplina:{
         type: String,
-        unique: true
     },
     Categoria:[{
         ref: 'Categorias',

@@ -31,6 +31,7 @@ const AdminHome = () => {
 
       {["Natacion", "Acuatlon", "Triatlon"].map((disciplina, index) => {
         const colorClasses = ["text-primary-100", "text-primary-300", "text-primary-400"];
+        const bgColorClasses = ["bg-primary-150", "bg-primary-300", "bg-primary-450"]; // Nuevas clases de fondo
         const competencias = items.filter((comp) => comp.Disciplina === disciplina);
 
         return (
@@ -43,6 +44,7 @@ const AdminHome = () => {
                   key={competencia._id}
                   competencia={competencia}
                   onDelete={() => handleDeleteCompetencia(competencia._id)}
+                  bgColorClass={bgColorClasses[index]} // Pasar la clase de fondo al card
                 />
               ))}
             </div>
@@ -53,7 +55,7 @@ const AdminHome = () => {
   );
 };
 
-const CompetenciaCard = ({ competencia, onDelete }) => {
+const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedCompetencia, setEditedCompetencia] = useState({ ...competencia });
   const { fetchData } = useUpItemsContext(); // Para actualizar después de guardar
@@ -83,7 +85,7 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
   };
 
   return (
-    <div className="bg-primary-300 rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5">
+    <div className={`${bgColorClass} rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5 transition hover:scale-105 duration-200`}>
       <img
         src={competencia.Imagen?.url}
         alt={competencia.Nombre}
@@ -134,11 +136,13 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
               <option value="Mixto">Mixto</option>
             </select>
             <div className="flex gap-2 mt-3">
-              <button onClick={handleSaveClick} className="text-center bg-blue-600 text-white font-bold rounded-xl p-2">
-                Guardar
-              </button>
+              
               <button onClick={handleCancelClick} className="text-center bg-red-600 text-white font-bold rounded-xl p-2">
                 Cancelar
+              </button>
+
+              <button onClick={handleSaveClick} className="text-center bg-blue-600 text-white font-bold rounded-xl p-2">
+                Guardar
               </button>
             </div>
           </div>

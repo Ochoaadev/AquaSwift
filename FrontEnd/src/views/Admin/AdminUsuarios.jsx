@@ -88,7 +88,7 @@ function AdminUsuarios() {
   };
 
   return (
-    <div className="p-6 w-5/6 mx-auto poppins">
+    <div className="p-6 w-5/6 mx-auto poppins ">
       <div className="flex flex-col">
         <div className="flex items-center">
           <img src={Usuario} alt="Usuario" className="lg:w-1/12 md:w-2/12 w-4/12 mr-4" />
@@ -99,9 +99,9 @@ function AdminUsuarios() {
         <div className="w-full h-2 bg-primary-0 mt-3 mb-5"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
         {usuarios.map((user) => (
-          <div key={user._id} className="bg-primary-300 shadow-md rounded-lg p-4">
+          <div key={user._id} className="bg-primary-300 shadow-md rounded-lg p-4 transition hover:scale-105 duration-200">
           {!isEditing || currentUser._id !== user._id ? (
             <>
               <h2 className="text-3xl font-bold text-center text-primary-500">{user.Nombre_Apellido}</h2>

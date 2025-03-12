@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useUpItemsContext } from "../contexts/UpProvider";
+import { useLocation } from "react-router-dom";
 
 const AgregarCompetencia = () => {
+  const location = useLocation();
   const [nombre, setNombre] = useState("");
   const [fecha, setFecha] = useState("");
   const [disciplina, setDisciplina] = useState("");
@@ -14,6 +16,12 @@ const AgregarCompetencia = () => {
 
   const { fetchData } = useUpItemsContext();
 
+  // Determinar la disciplina según la ruta
+  let disciplinaFija = "";
+  if (location.pathname === "/natacion") disciplinaFija = "Natacion";
+  else if (location.pathname === "/acuatlon") disciplinaFija = "Acuatlon";
+  else if (location.pathname === "/triatlon") disciplinaFija = "Triatlon";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -22,7 +30,7 @@ const AgregarCompetencia = () => {
     const formData = new FormData();
     formData.append("Nombre", nombre);
     formData.append("Fecha", fecha);
-    formData.append("Disciplina", disciplina);
+    formData.append("Disciplina", disciplinaFija || disciplina);
     formData.append("Categoria", categoria);
     formData.append("Genero", genero);
     if (Imagen) {
@@ -36,7 +44,8 @@ const AgregarCompetencia = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Error al crear la competencia");
+        const data = await response.json();
+        throw new Error(data.message || "Error al crear la competencia");
       }
 
       await fetchData();
@@ -50,7 +59,7 @@ const AgregarCompetencia = () => {
       setImagen(null);
     } catch (error) {
       console.error("Error:", error);
-      setError("Competencia creada correctamente");
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -87,12 +96,14 @@ const AgregarCompetencia = () => {
                 className="w-full p-2 border rounded-xl"
                 required
               />
-              
+
+              {/* Select de Disciplina */}
               <select
-                value={disciplina}
+                value={disciplinaFija || disciplina}
                 onChange={(e) => setDisciplina(e.target.value)}
                 className="w-full p-2 border rounded-xl bg-white"
                 required
+                disabled={!!disciplinaFija} // Deshabilitar si hay una disciplina fija
               >
                 <option value="">Seleccione Disciplina</option>
                 <option value="Natacion">Natación</option>
