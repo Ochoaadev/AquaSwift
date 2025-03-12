@@ -46,14 +46,16 @@ const Footer = () => {
               </svg>
             </span>
           </span>
-          <div className='mt-2 flex flex-col items-center'>
+          <div className='mt-4 flex items-center justify-center gap-3'>
+            <div>
+              <p className='mt-1 text-sm'>Universidad Valle Momboy</p>
+              <p className='text-sm'>Facultad de Ingeniería</p>
+            </div>
             <img
               src='/logouvm.png'
               alt='Logo UVM'
-              className='w-24 rounded-full'
+              className='w-20 rounded-full'
             />
-            <p className='mt-1 text-sm'>Universidad Valle Momboy</p>
-            <p className='text-sm'>Facultad de Ingeniería</p>
           </div>
         </div>
       </div>
