@@ -76,11 +76,11 @@ const Header = () => {
   return (
     <nav className='bg-primary-500 p-4'>
       <div className='container mx-auto flex justify-between items-center'>
-        <div className='lg:pl-6 md:pl-4 sm:-pl-2'>
+        <div className='group relative lg:pl-6 md:pl-4 sm:-pl-2'>
           <img
             src={logo}
             alt='Logo'
-            className='transition hover:scale-105 duration-200 rounded-2xl w-24 hover:rotate-2 hover:shadow-lg'
+            className=' w-24 transition-transform duration-200 group-hover:scale-105 group-hover:rotate-2'
           />
         </div>
 

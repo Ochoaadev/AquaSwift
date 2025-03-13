@@ -54,7 +54,7 @@ const Footer = () => {
             <img
               src='/logouvm.png'
               alt='Logo UVM'
-              className='w-20 rounded-full'
+              className='w-12 rounded-full'
             />
           </div>
         </div>

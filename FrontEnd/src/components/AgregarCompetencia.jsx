@@ -70,7 +70,7 @@ const AgregarCompetencia = () => {
       <div className="flex justify-center items-center">
         <button
           onClick={() => setModalOpen(true)}
-          className="bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-2xl md:text-2xl lg:text-3xl font-bold py-2 px-4 rounded-lg"
+          className="bg-gradient-to-r transition hover:scale-105 duration-200 from-[#1E40AF] to-[#9333EA] text-2xl md:text-2xl lg:text-3xl font-bold py-2 px-4 rounded-lg"
         >
           + Agregar Competencia
         </button>

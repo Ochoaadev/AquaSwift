@@ -99,11 +99,11 @@ const Perfil = () => {
   return (
     <div className="mx-auto w-5/6 my-5 poppins text-center">
       <div className="grid justify-center items-center text-center">
-        <img src={perfil} alt="Perfil" className="w-2/6 rounded mx-auto" />
+        <img src={perfil} alt="Perfil" className="w-2/6 rounded mx-auto transition hover:scale-105 duration-200" />
         <h1 className="text-4xl mb-4 text-center">Perfil de Usuario</h1>
       </div>
 
-      <div className="bg-primary-100 lg:w-5/12 md:w-10/12 mx-auto p-8 rounded-xl">
+      <div className="bg-primary-100 lg:w-5/12 md:w-10/12 mx-auto p-8 rounded-xl transition hover:scale-105 duration-200">
         <h1 className="text-3xl font-bold">Hola!</h1>
         <h1 className="text-3xl text-primary-500 -mt-1 font-bold">{userProfile.Nombre_Apellido}</h1>
 
