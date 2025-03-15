@@ -60,20 +60,28 @@ const Login = () => {
         localStorage.setItem("token", response.data.token);
         const userRole = response.data.Rol;
 
-        // Redirigir después de cerrar el modal
         if (userRole === "Admin") {
           navigate("/adminHome");
-        } else if (userRole === "Usuario") {
+        } else {
           navigate("/userHome");
         }
+      } else {
+        setShowModal({
+          isOpen: true,
+          content: {
+            title: "Error de Inicio de Sesión",
+            message: response.data.message || "Credenciales incorrectas",
+            type: "error"
+          }
+        });
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setShowModal({
         isOpen: true,
         content: {
-          title: "Error de Inicio de Sesión",
-          message: "Email o contraseña incorrectos",
+          title: "Error de Red",
+          message: "Hubo un problema con la conexión al servidor",
           type: "error"
         }
       });

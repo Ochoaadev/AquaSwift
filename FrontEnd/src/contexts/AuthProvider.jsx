@@ -73,36 +73,33 @@ export const AuthProvider = ({ children }) => {
 
     const signIn = async (credentials) => {
       try {
-          const response = await fetch('http://localhost:4000/api/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(credentials),
-          });
-  
-          const data = await response.json();
-  
-          if (response.ok) {
-              const { token, Rol, _id } = data; // Obtener _id de la respuesta
-  
-              setUser({
-                  _id,  // Guardamos el _id aquí
-                  role: Rol,
-              });
-  
-              // Guardar el token, rol y _id en localStorage
-              localStorage.setItem('token', token);
-              localStorage.setItem('role', Rol);
-              localStorage.setItem('_id', _id); // Guardamos el _id del usuario
-  
-              return { status: response.status, data };
-          } else {
-              return { status: response.status, data };
-          }
+        const response = await fetch("http://localhost:4000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(credentials)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return { status: response.status, data };
+        }
+
+        const { token, Rol, _id } = data;
+
+        setUser({ _id, role: Rol });
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", Rol);
+        localStorage.setItem("_id", _id);
+
+        return { status: 200, data };
       } catch (error) {
-          console.error('Error al iniciar sesión:', error);
-          return { status: 500, data: { message: 'Error de servidor' } };
+        console.error("Error en signIn:", error);
+        return { status: 500, data: { message: "Error de servidor" } };
       }
-  };
+    };
+    
   
     
     
