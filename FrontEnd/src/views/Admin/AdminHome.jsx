@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useItemsContext, useUpItemsContext } from "../../contexts/UpProvider";
+import { useItemsContext, useUpItemsContext, useCategoriasContext} from "../../contexts/UpProvider";
 import { api } from "../../service/apiService";
 import equipo from "/equipo.png";
 import editar from "/editar.png";
@@ -10,6 +10,7 @@ import AgregarCompetencia from "../../components/AgregarCompetencia";
 const AdminHome = () => {
   const { items } = useItemsContext();
   const { fetchData } = useUpItemsContext();
+  
 
   const handleDeleteCompetencia = async (id) => {
     try {
@@ -59,6 +60,7 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedCompetencia, setEditedCompetencia] = useState({ ...competencia });
   const { fetchData } = useUpItemsContext(); // Para actualizar después de guardar
+  const categorias = useCategoriasContext();
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
@@ -109,12 +111,19 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
               onChange={handleInputChange}
               className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
             />
-            <input
-              name="Categoria"
-              value={editedCompetencia.Categoria.map((cat) => cat.Nombre).join(", ")}
-              onChange={handleInputChange}
-              className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
-            />
+              <select
+                name="Categoria"
+                value={editedCompetencia.Categoria}
+                onChange={handleInputChange}
+                className="text-primary-100 text-sm mb-2 border p-2 rounded-xl w-52"
+              >
+                <option value="">Seleccione una categoría</option>
+                {categorias.map((categoria) => (
+                  <option key={categoria._id} value={categoria._id}>
+                    {categoria.Nombre}
+                  </option>
+                ))}
+              </select>
             <select
               name="Disciplina"
               value={editedCompetencia.Disciplina}

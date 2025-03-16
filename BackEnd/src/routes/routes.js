@@ -8,6 +8,8 @@ const { Obten_User, Eliminar_User, Edit_User, ActPassword, Listar_Users} = requi
 const {signIn, signUp, logout} = require('../controllers/User/Login-register')
 const {CreateCompet, DeleteCompet, UpdateCompet, getAllCompet, getByIdCompet} = require('../controllers/CompetController');
 const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, updateCategoria} = require('../controllers/CategoriaController')
+const { inscribirAtleta, obtenerInscripcionesAtleta, obtenerInscripcionesCompetencia} = require('../controllers/InscripController');
+const {createPrueba, getPruebasByCompetencia, deletePrueba, updatePrueba} = require('../controllers/PruebaController');
 
 
 //Filtro de busqueda
@@ -74,6 +76,24 @@ router.delete('/Categorias/:id', deleteCategoria)
 //Filtro de busqueda
 
 router.get('/Filtrar', filtrar);
+
+//Inscripciones
+
+// Inscribir a un atleta en una competencia
+router.post("/inscribir", inscribirAtleta);
+
+// Obtener todas las inscripciones de un atleta
+router.get("/atleta/:atletaId", obtenerInscripcionesAtleta);
+
+// Obtener todas las inscripciones de una competencia
+router.get("/competencia/:competenciaId", obtenerInscripcionesCompetencia);
+
+//Pruebas
+
+router.post("/pruebas", createPrueba);
+router.get("/pruebas/competencia/:competenciaId", getPruebasByCompetencia);
+router.put("/pruebas/:id", updatePrueba);
+router.delete("/pruebas/:id", deletePrueba);
 
 
 module.exports = router

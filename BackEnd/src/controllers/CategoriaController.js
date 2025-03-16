@@ -13,9 +13,12 @@ const createCategoria = async (req, res) => {
 };
 
 //Obtener todas las categorías
+// Obtener todas las categorías (con filtro opcional por modalidad)
 const getCategorias = async (req, res) => {
   try {
-    const categorias = await Categoria.find();
+    const { modalidad } = req.query; // Obtén la modalidad desde la query string
+    const query = modalidad ? { Modalidad: modalidad } : {}; // Filtra por modalidad si existe
+    const categorias = await Categoria.find(query);
     res.status(200).json(categorias);
   } catch (error) {
     console.error("Error al obtener categorías:", error);

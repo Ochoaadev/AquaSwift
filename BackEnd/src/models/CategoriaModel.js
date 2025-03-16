@@ -12,10 +12,12 @@ const CategoriaSchema = new schema({
     },
     Genero:{
         type: String,
+        enum: ["Masculino", "Femenino", "Mixto"],
         required: true
     },
     Modalidad:{
         type: String,
+        enum: ["Natacion", "Acuatlon", "Triatlon"],
         required: true
     }
 })

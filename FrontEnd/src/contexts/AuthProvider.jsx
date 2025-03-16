@@ -12,42 +12,8 @@ export const AuthProvider = ({ children }) => {
   
       if (!token || !userId) return;
   
-      const checkAuth = async () => {
-          try {
-              const res = await fetch("http://localhost:4000/api/VerifySession", {
-                  method: "GET",
-                  headers: {
-                      "Authorization": `Bearer ${token}`,
-                      "Content-Type": "application/json",
-                  },
-              });
-  
-              const data = await res.json();
-              if (res.ok) {
-                  setUser(data.user);  // Suponiendo que "data.user" contiene el usuario
-                  startLogoutTimer();
-              } else {
-                  logout();
-              }
-          } catch (error) {
-              console.error("Error verificando sesión:", error);
-              logout();
-          }
-      };
-  
-      checkAuth();
-  
-      return () => clearTimeout(logoutTimer);
   }, []);
-  
 
-    const startLogoutTimer = () => {
-        clearTimeout(logoutTimer);
-        logoutTimer = setTimeout(() => {
-            console.warn("Sesión cerrada por inactividad.");
-            logout();
-        }, 30 * 60 * 1000); // 30 minutos de inactividad
-    };
 
     const signUp = async (userData) => {
       try {

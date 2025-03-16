@@ -6,8 +6,8 @@ import { ModalCustom } from "../components/ModalCustom";
 const Login = () => {
   const { signIn } = useContext(AuthContext);
   const [formData, setFormData] = useState({
-    email: "",
-    password: ""
+    loginInput: "", 
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -19,13 +19,13 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const validateForm = () => {
     const errors = {};
-    if (!formData.email) errors.email = true;
+    if (!formData.loginInput) errors.loginInput = true;
     if (!formData.password) errors.password = true;
 
     setErrors(errors);
@@ -40,10 +40,9 @@ const Login = () => {
         isOpen: true,
         content: {
           title: "Error de Formulario",
-          message:
-            "Por favor, asegúrese de llenar todos los campos requeridos.",
-          type: "form"
-        }
+          message: "Por favor, ingrese su email o username y contraseña.",
+          type: "form",
+        },
       });
       return;
     }
@@ -51,9 +50,14 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
+      const isEmail = formData.loginInput.includes("@"); 
+      const loginData = isEmail
+        ? { Email: formData.loginInput } // Si es un email, enviar Email
+        : { Username: formData.loginInput }; // Si no, enviar Username
+
       const response = await signIn({
-        Email: formData.email,
-        Contrasena: formData.password
+        ...loginData, // Envía Email o Username
+        Contrasena: formData.password, // Envía la contraseña
       });
 
       if (response.status === 200) {
@@ -73,9 +77,9 @@ const Login = () => {
         isOpen: true,
         content: {
           title: "Error de Inicio de Sesión",
-          message: "Email o contraseña incorrectos",
-          type: "error"
-        }
+          message: "Email, username o contraseña incorrectos",
+          type: "error",
+        },
       });
     } finally {
       setIsSubmitting(false);
@@ -84,29 +88,29 @@ const Login = () => {
 
   return (
     <>
-      <div className='px-2 w-11/12 mx-auto mt-5'>
-        <div className='mx-auto mt-8 w-full max-w-lg p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]'>
-          <h1 className='text-3xl font-bold text-center text-white mb-2 animate-fade-in'>
+      <div className="px-2 w-11/12 mx-auto mt-5">
+        <div className="mx-auto mt-8 w-full max-w-lg p-8 rounded-lg bg-gradient-to-r from-[#1E40AF] to-[#9333EA]">
+          <h1 className="text-3xl font-bold text-center text-white mb-2 animate-fade-in">
             Bienvenido
           </h1>
-          <p className='text-center text-white mb-6 animate-fade-in'>
+          <p className="text-center text-white mb-6 animate-fade-in">
             Ingresa en tu cuenta
           </p>
 
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* Campo de Email */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Campo de Email o Username */}
             <div>
               <input
-                type='email'
-                name='email'
-                value={formData.email}
+                type="text"
+                name="loginInput"
+                value={formData.loginInput}
                 onChange={handleChange}
-                placeholder={errors.email ? "Email *" : "Email"}
+                placeholder={errors.loginInput ? "Email o Username *" : "Email o Username"}
                 style={{ background: "transparent" }}
                 className={`w-full py-3 bg-transparent border-b ${
-                  errors.email ? "font-bold" : "font-medium"
+                  errors.loginInput ? "font-bold" : "font-medium"
                 } text-[#fff] ${
-                  errors.email
+                  errors.loginInput
                     ? "placeholder-[#FF0000]"
                     : "placeholder-[#CBD5E1]"
                 } focus:outline-none focus:scale-105 transition-all duration-300`}
@@ -116,8 +120,8 @@ const Login = () => {
             {/* Campo de Contraseña */}
             <div>
               <input
-                type='password'
-                name='password'
+                type="password"
+                name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder={errors.password ? "Contraseña *" : "Contraseña"}
@@ -134,27 +138,27 @@ const Login = () => {
 
             {/* Mensaje de error general */}
             {Object.keys(errors).length > 0 && (
-              <div className='text-[#FF0000] text-md text-center font-bold mb-4 animate-fade-in'>
+              <div className="text-[#FF0000] text-md text-center font-bold mb-4 animate-fade-in">
                 Todos los campos son requeridos
               </div>
             )}
 
             {/* Botón de Iniciar Sesión */}
             <button
-              type='submit'
+              type="submit"
               disabled={isSubmitting}
-              className='w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors duration-300 disabled:opacity-70'
+              className="w-full py-3 px-4 bg-[#A855F7] text-white rounded-[5px] hover:bg-[#A855F7]/70 transition-colors duration-300 disabled:opacity-70"
             >
               {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
             </button>
           </form>
 
           {/* Enlace a Registro */}
-          <div className='mt-6 flex justify-between'>
-            <span className='text-white'>No tienes una cuenta?</span>
+          <div className="mt-6 flex justify-between">
+            <span className="text-white">No tienes una cuenta?</span>
             <Link
-              to='/register'
-              className='text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70 transition-colors duration-300'
+              to="/register"
+              className="text-[#D8B4FE] hover:underline hover:text-[#D8B4FE]/70 transition-colors duration-300"
             >
               Regístrate
             </Link>

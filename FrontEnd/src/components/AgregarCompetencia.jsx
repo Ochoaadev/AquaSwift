@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useUpItemsContext } from "../contexts/UpProvider";
+import React, { useState, useEffect } from "react";
+import { useUpItemsContext, useCategoriasContext } from "../contexts/UpProvider";
 import { useLocation } from "react-router-dom";
 
 const AgregarCompetencia = () => {
@@ -7,7 +7,7 @@ const AgregarCompetencia = () => {
   const [nombre, setNombre] = useState("");
   const [fecha, setFecha] = useState("");
   const [disciplina, setDisciplina] = useState("");
-  const [categoria, setCategoria] = useState("");
+  const [categoriaId, setCategoriaId] = useState("");
   const [genero, setGenero] = useState("");
   const [Imagen, setImagen] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,12 +15,25 @@ const AgregarCompetencia = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const { fetchData } = useUpItemsContext();
+  const { categorias, fetchCategorias } = useCategoriasContext(); // Obtén las categorías y la función para filtrar
 
   // Determinar la disciplina según la ruta
   let disciplinaFija = "";
   if (location.pathname === "/natacion") disciplinaFija = "Natacion";
   else if (location.pathname === "/acuatlon") disciplinaFija = "Acuatlon";
   else if (location.pathname === "/triatlon") disciplinaFija = "Triatlon";
+
+  // Filtrar categorías según la disciplina
+  const categoriasFiltradas = categorias.filter(
+    (categoria) => categoria.Modalidad === (disciplinaFija || disciplina)
+  );
+
+  // Actualizar las categorías cuando cambia la disciplina
+  useEffect(() => {
+    if (disciplinaFija || disciplina) {
+      fetchCategorias(disciplinaFija || disciplina);
+    }
+  }, [disciplinaFija, disciplina]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +44,7 @@ const AgregarCompetencia = () => {
     formData.append("Nombre", nombre);
     formData.append("Fecha", fecha);
     formData.append("Disciplina", disciplinaFija || disciplina);
-    formData.append("Categoria", categoria);
+    formData.append("Categoria", categoriaId);
     formData.append("Genero", genero);
     if (Imagen) {
       formData.append("Imagen", Imagen);
@@ -54,7 +67,7 @@ const AgregarCompetencia = () => {
       setNombre("");
       setFecha("");
       setDisciplina("");
-      setCategoria("");
+      setCategoriaId("");
       setGenero("");
       setImagen(null);
     } catch (error) {
@@ -111,14 +124,21 @@ const AgregarCompetencia = () => {
                 <option value="Triatlon">Triatlón</option>
               </select>
 
-              <input
-                type="text"
-                placeholder="Categoría"
-                value={categoria}
-                onChange={(e) => setCategoria(e.target.value)}
-                className="w-full p-2 border rounded-xl"
+              {/* Select de Categoría */}
+              <select
+                value={categoriaId}
+                onChange={(e) => setCategoriaId(e.target.value)}
+                className="w-full p-2 border rounded-xl bg-white"
                 required
-              />
+              >
+                <option value="">Seleccione una categoría</option>
+                {categoriasFiltradas.map((categoria) => (
+                  <option key={categoria._id} value={categoria._id}>
+                    {categoria.Nombre}
+                  </option>
+                ))}
+              </select>
+
               <select
                 value={genero}
                 onChange={(e) => setGenero(e.target.value)}
