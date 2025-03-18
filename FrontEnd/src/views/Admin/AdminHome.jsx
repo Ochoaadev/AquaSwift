@@ -60,7 +60,8 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedCompetencia, setEditedCompetencia] = useState({ ...competencia });
   const { fetchData } = useUpItemsContext(); // Para actualizar después de guardar
-  const categorias = useCategoriasContext();
+  const { categorias } = useCategoriasContext();
+
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
