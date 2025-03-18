@@ -6,6 +6,7 @@ import editar from "/editar.png";
 import eliminar from "/eliminar.png";
 
 import AgregarCompetencia from "../../components/AgregarCompetencia";
+import MasInfo from "../../components/MasInfo"; 
 
 const AdminHome = () => {
   const { items } = useItemsContext();
@@ -61,6 +62,8 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   const [editedCompetencia, setEditedCompetencia] = useState({ ...competencia });
   const { fetchData } = useUpItemsContext(); // Para actualizar después de guardar
   const { categorias } = useCategoriasContext();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
 
   const handleEditClick = () => {
@@ -88,6 +91,9 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   };
 
   return (
+    <>
+
+    <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     <div className={`${bgColorClass} rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5 transition hover:scale-105 duration-200`}>
       <img
         src={competencia.Imagen?.url}
@@ -164,9 +170,13 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
             <p className="text-lg text-center lg:text-left"><span className="font-bold">Disciplina: </span>{competencia.Disciplina}</p>
             <p className="text-lg text-center lg:text-left"><span className="font-bold">Género: </span>{competencia.Genero}</p>
             <div className="grid grid-cols-2 lg:grid-cols-1 lg:justify-start gap-2 mt-2">
-              <button className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl">
-                Más Info
-              </button>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-1 px-3 rounded-xl"
+            >
+              Más Info
+            </button>
+
               <div className="flex gap-3">
                 <button onClick={onDelete} className="w-6/12 bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition hover:scale-105 duration-200 flex items-center justify-center">
                   <img src={eliminar} alt="Eliminar" className="w-5 h-5" />
@@ -180,6 +190,8 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
         )}
       </div>
     </div>
+
+    </>
   );
 };
 

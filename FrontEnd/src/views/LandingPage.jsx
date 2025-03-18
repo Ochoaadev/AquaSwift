@@ -5,7 +5,7 @@ import Ironman from "/ironman.png";
 
 export default function LandingPage() {
   return (
-
+<>
       <div className='px-5 w-11/12 mx-auto mt-5 '>
         <div className='flex justify-center items-center text-center w-full font-bold poppins my-4'>
           <h1 className='text-4xl lg:text-5xl md:text-4xl sm:text-4xl xs:text-4xl'>
@@ -72,5 +72,7 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+
+      </>
   );
 }
