@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { api } from '../../service/apiService';
 import { AuthContext } from '../../contexts/AuthProvider';
 import Usuario from "/usuario.png";
+import UserFilter from "../../components/userFilter";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -15,6 +16,7 @@ function AdminUsuarios() {
   const { token } = useContext(AuthContext);
   const [usuarios, setUsuarios] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null); // Almacenamos el usuario que estamos editando
   const [formData, setFormData] = useState({
     Nombre_Apellido: '',
@@ -29,6 +31,7 @@ function AdminUsuarios() {
       try {
         const data = await api.user.getAllUsers(token);
         setUsuarios(data);
+        setFilteredUsers(data);
       } catch (error) {
         console.error('Error al obtener usuarios:', error);
       }
@@ -87,6 +90,31 @@ function AdminUsuarios() {
     });
   };
 
+  // Búsqueda por nombre o username
+  const handleSearch = (searchTerm) => {
+    const filtered = usuarios.filter((user) =>
+      user.Nombre_Apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.Username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  };
+
+  // Filtro por género
+  const handleFilterGender = (gender) => {
+    const filtered = gender ? usuarios.filter((user) => user.Genero === gender) : usuarios;
+    setFilteredUsers(filtered);
+  };
+
+  // Ordenar por edad
+  const handleSortAge = (order) => {
+    const sorted = [...filteredUsers].sort((a, b) => {
+      const ageA = new Date().getFullYear() - new Date(a.Fecha_Nacimiento).getFullYear();
+      const ageB = new Date().getFullYear() - new Date(b.Fecha_Nacimiento).getFullYear();
+      return order === "asc" ? ageA - ageB : ageB - ageA;
+    });
+    setFilteredUsers(sorted);
+  };
+
   return (
     <div className="p-6 w-5/6 mx-auto poppins ">
       <div className="flex flex-col">
@@ -99,8 +127,10 @@ function AdminUsuarios() {
         <div className="w-full h-2 bg-primary-0 mt-3 mb-5"></div>
       </div>
 
+      <UserFilter onSearch={handleSearch} onSortAge={handleSortAge} onFilterGender={handleFilterGender} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
-        {usuarios.map((user) => (
+      {filteredUsers.map((user) => (
           <div key={user._id} className="bg-primary-300 shadow-md rounded-lg p-4 transition hover:scale-105 duration-200">
           {!isEditing || currentUser._id !== user._id ? (
             <>
