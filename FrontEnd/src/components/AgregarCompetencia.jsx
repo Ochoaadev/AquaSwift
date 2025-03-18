@@ -35,6 +35,17 @@ const AgregarCompetencia = () => {
     }
   }, [disciplinaFija, disciplina]);
 
+  const limpiarFormulario = () => {
+    setNombre("");
+    setFecha("");
+    setDisciplina("");
+    setCategoriaId("");
+    setGenero("");
+    setImagen(null);
+    setError("");
+    setModalOpen(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -76,6 +87,9 @@ const AgregarCompetencia = () => {
     } finally {
       setLoading(false);
     }
+
+    
+    
   };
 
   return (
@@ -130,6 +144,7 @@ const AgregarCompetencia = () => {
                 onChange={(e) => setCategoriaId(e.target.value)}
                 className="w-full p-2 border rounded-xl bg-white"
                 required
+                disabled={!disciplinaFija && !disciplina} // Deshabilitar si no hay disciplina seleccionada
               >
                 <option value="">Seleccione una categoría</option>
                 {categoriasFiltradas.map((categoria) => (
@@ -138,6 +153,7 @@ const AgregarCompetencia = () => {
                   </option>
                 ))}
               </select>
+
 
               <select
                 value={genero}
@@ -159,13 +175,14 @@ const AgregarCompetencia = () => {
               />
               {error && <p className="text-green-700 text-center">{error}</p>}
               <div className="flex justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600"
-                >
-                  Cancelar
-                </button>
+              <button
+              type="button"
+              onClick={limpiarFormulario}
+              className="bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600"
+            >
+              Cancelar
+            </button>
+
                 <button
                   type="submit"
                   disabled={loading}
