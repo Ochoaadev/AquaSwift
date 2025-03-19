@@ -3,14 +3,13 @@ import { api } from '../../service/apiService';
 import { useItemsContext } from '../../contexts/UpProvider';
 import equipo from "/equipo.png";
 
-import MasInfo from "../../components/MasInfo"; 
+import MasInfo from "../../components/MasInfo";
 import Inscripcion from "../../components/Inscripcion";
-
-
 
 const UserHome = () => {
   const [nombre, setNombre] = useState('');
-  const [modalType, setModalType] = useState(null);  // Estado para controlar qué modal está abierto
+  const [modalType, setModalType] = useState(null); // Estado para controlar qué modal está abierto
+  const [competenciaSeleccionada, setCompetenciaSeleccionada] = useState(null); // Para pasar la competencia seleccionada
   const userId = localStorage.getItem('_id');
   const { items } = useItemsContext();
 
@@ -18,7 +17,7 @@ const UserHome = () => {
     const fetchUserName = async () => {
       try {
         const profile = await api.user.getProfile(userId);
-        setNombre(profile.Nombre_Apellido); 
+        setNombre(profile.Nombre_Apellido);
       } catch (error) {
         console.error('Error fetching user profile:', error);
       }
@@ -33,8 +32,16 @@ const UserHome = () => {
 
   return (
     <>
-      <MasInfo isOpen={modalType === 'info'} onClose={() => setModalType(null)} />
+      {/* Modales de Más Info y Inscripción */}
+      {competenciaSeleccionada && (
+        <MasInfo 
+          isOpen={modalType === 'info'} 
+          onClose={() => setModalType(null)} 
+          pruebas={competenciaSeleccionada.Pruebas || []} 
+        />
+      )}
       <Inscripcion isOpen={modalType === 'inscripcion'} onClose={() => setModalType(null)} />
+
       <div className='mx-auto w-5/6 my-5'>
         <div className='text-center my-4 text-2xl lg:text-4xl md:text-3xl'>
           <h1 className='font-bold'>Bienvenido <span className='text-primary-100'>{nombre}</span></h1>
@@ -56,8 +63,9 @@ const UserHome = () => {
                     <CompetenciaCard
                       key={competencia._id}
                       competencia={competencia}
-                      bgColorClass={bgColorClasses[index]} 
-                      setModalType={setModalType}  // Pasar setModalType para manejar la apertura del modal
+                      bgColorClass={bgColorClasses[index]}
+                      setModalType={setModalType} // Pasar setModalType para manejar la apertura del modal
+                      setCompetenciaSeleccionada={setCompetenciaSeleccionada} // Pasar la competencia seleccionada
                     />
                   ))}
                 </div>
@@ -70,7 +78,12 @@ const UserHome = () => {
   );
 };
 
-const CompetenciaCard = ({ competencia, bgColorClass, setModalType }) => {
+const CompetenciaCard = ({ competencia, bgColorClass, setModalType, setCompetenciaSeleccionada }) => {
+  const handleMoreInfoClick = () => {
+    setCompetenciaSeleccionada(competencia); // Pasar la competencia seleccionada
+    setModalType('info'); // Abre el modal de Más Info
+  };
+
   return (
     <div className={`${bgColorClass} rounded-xl p-5 flex flex-col lg:flex-row justify-center items-center gap-5 transition hover:scale-105 duration-200`}>
       <img
@@ -86,7 +99,7 @@ const CompetenciaCard = ({ competencia, bgColorClass, setModalType }) => {
           <p className="text-lg text-center lg:text-left"><span className="font-bold">Disciplina: </span>{competencia.Disciplina}</p>
           <p className="text-lg text-center lg:text-left"><span className="font-bold">Género: </span>{competencia.Genero}</p>
           <div className="grid grid-cols-2 lg:grid-cols-1 lg:justify-start gap-2 mt-2">
-            <button onClick={() => setModalType('info')} className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl transition hover:scale-105 duration-200">
+            <button onClick={handleMoreInfoClick} className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl transition hover:scale-105 duration-200">
               Más Info
             </button>
 
@@ -99,4 +112,5 @@ const CompetenciaCard = ({ competencia, bgColorClass, setModalType }) => {
     </div>
   );
 };
+
 export default UserHome;

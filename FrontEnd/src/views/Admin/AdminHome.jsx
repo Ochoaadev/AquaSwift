@@ -93,7 +93,7 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   return (
     <>
 
-    <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pruebas={competencia.Pruebas} />
     <div className={`${bgColorClass} rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5 transition hover:scale-105 duration-200`}>
       <img
         src={competencia.Imagen?.url}

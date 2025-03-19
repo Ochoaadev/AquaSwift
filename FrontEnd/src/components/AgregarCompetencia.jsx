@@ -2,6 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useUpItemsContext, useCategoriasContext } from "../contexts/UpProvider";
 import { useLocation } from "react-router-dom";
 
+const pruebasPorEstilo = {
+  "Libre": [
+    "50 mts libre", "100 mts libre", "200 mts libre", "400 mts libre", "800 mts libre", "1500 mts libre"
+  ],
+  "Espalda": [
+    "50 mts espalda", "100 mts espalda", "200 mts espalda"
+  ],
+  "Pecho": [
+    "50 mts pecho", "100 mts pecho", "200 mts pecho"
+  ],
+  "Mariposa": [
+    "50 mts fly", "100 mts fly", "200 mts fly"
+  ],
+  "Combinado": [
+    "200 mts C.I", "400 mts C.I"
+  ]
+};
+
 const AgregarCompetencia = () => {
   const location = useLocation();
   const [nombre, setNombre] = useState("");
@@ -9,26 +27,25 @@ const AgregarCompetencia = () => {
   const [disciplina, setDisciplina] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
   const [genero, setGenero] = useState("");
-  const [Imagen, setImagen] = useState(null);
+  const [imagen, setImagen] = useState(null);
+  const [pruebas, setPruebas] = useState([]); // Estado para almacenar pruebas seleccionadas
+  const [estilo, setEstilo] = useState(""); // Estado para manejar el estilo seleccionado
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
   const { fetchData } = useUpItemsContext();
-  const { categorias, fetchCategorias } = useCategoriasContext(); // Obtén las categorías y la función para filtrar
+  const { categorias, fetchCategorias } = useCategoriasContext();
 
-  // Determinar la disciplina según la ruta
   let disciplinaFija = "";
   if (location.pathname === "/natacion") disciplinaFija = "Natacion";
   else if (location.pathname === "/acuatlon") disciplinaFija = "Acuatlon";
   else if (location.pathname === "/triatlon") disciplinaFija = "Triatlon";
 
-  // Filtrar categorías según la disciplina
   const categoriasFiltradas = categorias.filter(
     (categoria) => categoria.Modalidad === (disciplinaFija || disciplina)
   );
 
-  // Actualizar las categorías cuando cambia la disciplina
   useEffect(() => {
     if (disciplinaFija || disciplina) {
       fetchCategorias(disciplinaFija || disciplina);
@@ -42,54 +59,58 @@ const AgregarCompetencia = () => {
     setCategoriaId("");
     setGenero("");
     setImagen(null);
+    setPruebas([]);
+    setEstilo(""); // Limpiar el estilo seleccionado
     setError("");
     setModalOpen(false);
+  };
+
+  const handleCheckboxChange = (prueba) => {
+    setPruebas((prev) =>
+      prev.includes(prueba) ? prev.filter((p) => p !== prueba) : [...prev, prueba]
+    );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     const formData = new FormData();
     formData.append("Nombre", nombre);
     formData.append("Fecha", fecha);
     formData.append("Disciplina", disciplinaFija || disciplina);
     formData.append("Categoria", categoriaId);
     formData.append("Genero", genero);
-    if (Imagen) {
-      formData.append("Imagen", Imagen);
+    
+    // Asegurar que las pruebas se envíen correctamente
+    pruebas.forEach((prueba) => {
+      formData.append("Pruebas[]", prueba); // Enviar cada prueba como un campo separado
+    });
+  
+    if (imagen) {
+      formData.append("Imagen", imagen);
     }
-
+  
     try {
       const response = await fetch("http://localhost:4000/api/competencias", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || "Error al crear la competencia");
       }
-
+  
       await fetchData();
-      setModalOpen(false);
-
-      setNombre("");
-      setFecha("");
-      setDisciplina("");
-      setCategoriaId("");
-      setGenero("");
-      setImagen(null);
+      limpiarFormulario();
     } catch (error) {
       console.error("Error:", error);
       setError(error.message);
     } finally {
       setLoading(false);
     }
-
-    
-    
   };
 
   return (
@@ -124,13 +145,12 @@ const AgregarCompetencia = () => {
                 required
               />
 
-              {/* Select de Disciplina */}
               <select
                 value={disciplinaFija || disciplina}
                 onChange={(e) => setDisciplina(e.target.value)}
                 className="w-full p-2 border rounded-xl bg-white"
                 required
-                disabled={!!disciplinaFija} // Deshabilitar si hay una disciplina fija
+                disabled={!!disciplinaFija}
               >
                 <option value="">Seleccione Disciplina</option>
                 <option value="Natacion">Natación</option>
@@ -138,13 +158,12 @@ const AgregarCompetencia = () => {
                 <option value="Triatlon">Triatlón</option>
               </select>
 
-              {/* Select de Categoría */}
               <select
                 value={categoriaId}
                 onChange={(e) => setCategoriaId(e.target.value)}
                 className="w-full p-2 border rounded-xl bg-white"
                 required
-                disabled={!disciplinaFija && !disciplina} // Deshabilitar si no hay disciplina seleccionada
+                disabled={!disciplinaFija && !disciplina}
               >
                 <option value="">Seleccione una categoría</option>
                 {categoriasFiltradas.map((categoria) => (
@@ -153,7 +172,6 @@ const AgregarCompetencia = () => {
                   </option>
                 ))}
               </select>
-
 
               <select
                 value={genero}
@@ -166,6 +184,7 @@ const AgregarCompetencia = () => {
                 <option value="Femenino">Femenino</option>
                 <option value="Mixto">Mixto</option>
               </select>
+
               <input
                 type="file"
                 accept="image/*"
@@ -173,22 +192,64 @@ const AgregarCompetencia = () => {
                 className="w-full p-2 border rounded-xl"
                 required
               />
-              {error && <p className="text-green-700 text-center">{error}</p>}
+
+              {/* Sección de selección del estilo */}
+              {disciplina === "Natacion" && (
+                <div className="w-full p-2 border rounded-xl">
+                  <label htmlFor="estilo" className="block font-semibold">Selecciona las pruebas:</label>
+                  <select
+                    id="estilo"
+                    value={estilo}
+                    onChange={(e) => setEstilo(e.target.value)}
+                    className="w-full p-2 border rounded-xl"
+                    disabled={disciplina !== "Natacion"}
+                  >
+                    <option value="">Seleccione un estilo</option>
+                    <option value="Libre">Libre</option>
+                    <option value="Espalda">Espalda</option>
+                    <option value="Pecho">Pecho</option>
+                    <option value="Mariposa">Mariposa</option>
+                    <option value="Combinado">Combinado</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Sección de pruebas correspondientes al estilo seleccionado */}
+              {estilo && (
+                <div className="border p-2 rounded-xl mt-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    {pruebasPorEstilo[estilo]?.map((prueba) => (
+                      <label key={prueba} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          value={prueba}
+                          checked={pruebas.includes(prueba)}
+                          onChange={() => handleCheckboxChange(prueba)}
+                        />
+                        <span className="text-primary-600">{prueba}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {error && <p className="text-red-700 text-center">{error}</p>}
+
               <div className="flex justify-center gap-4">
-              <button
-              type="button"
-              onClick={limpiarFormulario}
-              className="bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600"
-            >
-              Cancelar
-            </button>
+                <button
+                  type="button"
+                  onClick={limpiarFormulario}
+                  className="bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600"
+                >
+                  Cancelar
+                </button>
 
                 <button
                   type="submit"
                   disabled={loading}
                   className="bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700"
                 >
-                  {loading ? "Creando..." : "Crear"}
+                  {loading ? "Guardando..." : "Guardar Competencia"}
                 </button>
               </div>
             </form>
