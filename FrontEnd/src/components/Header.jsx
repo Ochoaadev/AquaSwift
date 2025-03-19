@@ -50,7 +50,8 @@ const Header = () => {
 
   const availableRoutes = routes[role] || routes["free"];
 
-  const handleLogout = async () => {
+  const handleLogout = (e) => {
+    e.preventDefault(); // Prevenir la navegación por defecto
     setShowModal(true);
   };
 
@@ -94,7 +95,7 @@ const Header = () => {
                   ? "text-primary-400"
                   : "text-white hover:text-primary-400"
               }`}
-              onClick={route.name === "Logout" ? handleLogout: undefined}
+              onClick={route.name === "Logout" ? handleLogout : undefined}
             >
               {route.name}
               <span
@@ -142,8 +143,11 @@ const Header = () => {
                   ? "text-primary-600 bg-primary-450"
                   : "text-white hover:bg-primary-450"
               }`}
-              onClick={() => {
-                if (route.name === "Logout") handleLogout();
+              onClick={(e) => {
+                if (route.name === "Logout") {
+                  e.preventDefault(); // Prevenir la navegación por defecto
+                  handleLogout(e);
+                }
                 toggleMenu();
               }}
             >
