@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUpItemsContext, useCategoriasContext } from "../contexts/UpProvider";
 import { useLocation } from "react-router-dom";
 
-const pruebasPorEstilo = {
+const pruebasNatacion = {
   "Libre": [
     "50 mts libre", "100 mts libre", "200 mts libre", "400 mts libre", "800 mts libre", "1500 mts libre"
   ],
@@ -19,6 +19,11 @@ const pruebasPorEstilo = {
     "200 mts C.I", "400 mts C.I"
   ]
 };
+
+const pruebasAcuatlon = ["3 km", "5 km", "6 km", "8 km"];
+const pruebasTriatlon = ["26 km", "52 km", "113 km"];
+
+
 
 const AgregarCompetencia = () => {
   const location = useLocation();
@@ -47,10 +52,11 @@ const AgregarCompetencia = () => {
   );
 
   useEffect(() => {
-    if (disciplinaFija || disciplina) {
-      fetchCategorias(disciplinaFija || disciplina);
+    if (disciplinaFija) {
+      setDisciplina(disciplinaFija);
     }
-  }, [disciplinaFija, disciplina]);
+  }, [disciplinaFija]);
+  
 
   const limpiarFormulario = () => {
     setNombre("");
@@ -193,45 +199,84 @@ const AgregarCompetencia = () => {
                 required
               />
 
-              {/* Sección de selección del estilo */}
+              {/* Sección para selección de pruebas en natación */}
               {disciplina === "Natacion" && (
                 <div className="w-full p-2 border rounded-xl">
-                  <label htmlFor="estilo" className="block font-semibold">Selecciona las pruebas:</label>
+                  <label htmlFor="estilo" className="block font-semibold">Selecciona el estilo:</label>
                   <select
                     id="estilo"
                     value={estilo}
                     onChange={(e) => setEstilo(e.target.value)}
                     className="w-full p-2 border rounded-xl"
-                    disabled={disciplina !== "Natacion"}
                   >
                     <option value="">Seleccione un estilo</option>
-                    <option value="Libre">Libre</option>
-                    <option value="Espalda">Espalda</option>
-                    <option value="Pecho">Pecho</option>
-                    <option value="Mariposa">Mariposa</option>
-                    <option value="Combinado">Combinado</option>
+                    {Object.keys(pruebasNatacion).map((key) => (
+                      <option key={key} value={key}>{key}</option>
+                    ))}
                   </select>
                 </div>
               )}
 
-              {/* Sección de pruebas correspondientes al estilo seleccionado */}
-              {estilo && (
-                <div className="border p-2 rounded-xl mt-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    {pruebasPorEstilo[estilo]?.map((prueba) => (
-                      <label key={prueba} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          value={prueba}
-                          checked={pruebas.includes(prueba)}
-                          onChange={() => handleCheckboxChange(prueba)}
-                        />
-                        <span className="text-primary-600">{prueba}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Mostrar pruebas según el estilo seleccionado en Natación */}
+{(disciplinaFija === "Natacion" || disciplina === "Natacion") && estilo && (
+  <div className="border p-2 rounded-xl mt-4">
+    <label className="block font-semibold">Selecciona las pruebas:</label>
+    <div className="grid grid-cols-2 gap-2">
+      {pruebasNatacion[estilo].map((prueba) => (
+        <label key={prueba} className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            value={prueba}
+            checked={pruebas.includes(prueba)}
+            onChange={() => handleCheckboxChange(prueba)}
+          />
+          <span className="text-primary-600">{prueba}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
+{/* Sección de pruebas para Acuatlón */}
+{(disciplinaFija === "Acuatlon" || disciplina === "Acuatlon") && (
+  <div className="border p-2 rounded-xl mt-4">
+    <label className="block font-semibold">Selecciona las pruebas:</label>
+    <div className="grid grid-cols-2 gap-2">
+      {pruebasAcuatlon.map((prueba) => (
+        <label key={prueba} className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            value={prueba}
+            checked={pruebas.includes(prueba)}
+            onChange={() => handleCheckboxChange(prueba)}
+          />
+          <span className="text-primary-600">{prueba}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
+{/* Sección de pruebas para Triatlón */}
+{(disciplinaFija === "Triatlon" || disciplina === "Triatlon") && (
+  <div className="border p-2 rounded-xl mt-4">
+    <label className="block font-semibold">Selecciona las pruebas:</label>
+    <div className="grid grid-cols-2 gap-2">
+      {pruebasTriatlon.map((prueba) => (
+        <label key={prueba} className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            value={prueba}
+            checked={pruebas.includes(prueba)}
+            onChange={() => handleCheckboxChange(prueba)}
+          />
+          <span className="text-primary-600">{prueba}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
 
               {error && <p className="text-red-700 text-center">{error}</p>}
 
