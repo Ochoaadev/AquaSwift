@@ -40,7 +40,15 @@ const AtletaSchema = new schema({
     Competencias: [{
         ref: 'Competencias',
         type: schema.Types.ObjectId
-    }]
+    }],
+    resetPasswordToken: { 
+        type: String,
+        default: null 
+    },
+    resetPasswordExpires: { 
+        type: Date,
+        default: null  
+    }
 })
 
 //Cifrar contraseña

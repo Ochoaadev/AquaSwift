@@ -11,6 +11,11 @@ const InscripcionSchema = new mongoose.Schema({
     ref: "Competencia",
     required: true,
   },
+  Prueba: {
+    type: mongoose.Schema.Types.ObjectId, // Relación con la prueba
+    ref: "Pruebas",
+    required: true,
+  },
   FechaInscripcion: {
     type: Date,
     default: Date.now, // Fecha automática al momento de la inscripción

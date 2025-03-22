@@ -8,9 +8,9 @@ const { Obten_User, Eliminar_User, Edit_User, ActPassword, Listar_Users} = requi
 const {signIn, signUp, logout} = require('../controllers/User/Login-register')
 const {CreateCompet, DeleteCompet, UpdateCompet, getAllCompet, getByIdCompet} = require('../controllers/CompetController');
 const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, updateCategoria} = require('../controllers/CategoriaController')
-const { inscribirAtleta, obtenerInscripcionesAtleta, obtenerInscripcionesCompetencia} = require('../controllers/InscripController');
+const {createInscripcion, getAllInscripciones, getInscripcionesByAtleta, getInscripcionesByCompetencia, getInscripcionesByPrueba, updateInscripcion, deleteInscripcion} = require('../controllers/InscripController');
 const {createPrueba, getPruebasByCompetencia, deletePrueba, updatePrueba} = require('../controllers/PruebaController');
-
+const {solicitarRecuperacion, cambiarContrasena} = require('../controllers/User/RestorePassword')
 
 //Filtro de busqueda
 
@@ -79,14 +79,18 @@ router.get('/Filtrar', filtrar);
 
 //Inscripciones
 
-// Inscribir a un atleta en una competencia
-router.post("/inscribir", inscribirAtleta);
 
-// Obtener todas las inscripciones de un atleta
-router.get("/atleta/:atletaId", obtenerInscripcionesAtleta);
-
-// Obtener todas las inscripciones de una competencia
-router.get("/competencia/:competenciaId", obtenerInscripcionesCompetencia);
+router.post("/inscripciones", createInscripcion);
+router.get("/inscripciones", getAllInscripciones);
+// Obtener inscripciones por atleta
+router.get("/inscripciones/atleta/:atletaId", getInscripcionesByAtleta);
+// Obtener inscripciones por competencia
+router.get("/inscripciones/competencia/:competenciaId", getInscripcionesByCompetencia);
+// Obtener inscripciones por prueba
+router.get("/inscripciones/prueba/:pruebaId", getInscripcionesByPrueba);
+// Actualizar el estado de una inscripción
+router.put("/inscripciones/:id", updateInscripcion);
+router.delete("/inscripciones/:id", deleteInscripcion);
 
 //Pruebas
 
@@ -95,6 +99,10 @@ router.get("/pruebas/competencia/:competenciaId", getPruebasByCompetencia);
 router.put("/pruebas/:id", updatePrueba);
 router.delete("/pruebas/:id", deletePrueba);
 
+//Recuperación de contraseña
+
+router.post('/solicitar-recuperacion', solicitarRecuperacion);
+router.post('/reset-password/:token', cambiarContrasena);
 
 module.exports = router
 
