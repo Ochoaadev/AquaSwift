@@ -2,9 +2,13 @@ import { useContext, useEffect, useState } from "react";
 import { api } from "../../service/apiService";
 import perfil from "/Perfil.png";
 import { AuthContext } from "../../contexts/AuthProvider";
+import PasswordRecoveryModal from "../../components/PasswordRecoveryModal"; // [MEJORA 1] Importación del nuevo modal de recuperación
+import toast from "react-hot-toast"; // [MEJORA 2] Para mostrar notificaciones
 
 const Perfil = () => {
+  // [MEJORA 3] Obtenemos más funciones del AuthContext
   const { solicitarRecuperacion } = useContext(AuthContext);
+  
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,6 +38,7 @@ const Perfil = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching user profile:", error);
+        toast.error("Error al cargar el perfil"); // [MEJORA 4] Notificación de error
         setLoading(false);
       }
     };
@@ -42,6 +47,7 @@ const Perfil = () => {
       fetchUserProfile();
     } else {
       console.error("User ID is not available in localStorage");
+      toast.error("No se encontró ID de usuario"); // [MEJORA 4] Notificación de error
       setLoading(false);
     }
   }, [userId]);
@@ -65,9 +71,11 @@ const Perfil = () => {
         ...formData
       }));
 
-      setIsEditing(false); // Ocultamos el formulario después de la actualización
+      setIsEditing(false);
+      toast.success("Perfil actualizado correctamente"); // [MEJORA 4] Notificación de éxito
     } catch (error) {
       console.error("Error updating profile:", error);
+      toast.error("Error al actualizar el perfil"); // [MEJORA 4] Notificación de error
     }
   };
 
@@ -80,16 +88,29 @@ const Perfil = () => {
       Fecha_Nacimiento: userProfile.Fecha_Nacimiento
     });
     setIsEditing(false);
+    toast("Cambios descartados", { icon: "ℹ️" }); // [MEJORA 4] Notificación informativa
   };
 
+  // [MEJORA 5] Función mejorada para manejar la recuperación de contraseña
   const handleRecoveryPassword = async () => {
+    if (!userProfile?.Email) {
+      toast.error("No se encontró email asociado al perfil");
+      return;
+    }
+
     setIsSendingEmail(true);
-    await solicitarRecuperacion({ email });
-    setIsSendingEmail(false);
+    try {
+      await solicitarRecuperacion(userProfile.Email);
+      toast.success("Correo de recuperación enviado");
+    } catch (error) {
+      toast.error("Error al enviar el correo de recuperación");
+    } finally {
+      setIsSendingEmail(false);
+    }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="poppins text-center mx-auto mt-5 text-2xl">Cargando perfil...</div>;
   }
 
   if (!userProfile) {
@@ -237,16 +258,31 @@ const Perfil = () => {
           </div>
         )}
       </div>
-      <p
-        className={`pt-2 cursor-pointer hover:text-slate-300 ${
-          isSendingEmail ? "text-slate-300" : ""
-        }`}
-        onClick={() => !isSendingEmail && handleRecoveryPassword()}
-      >
-        {isSendingEmail
-          ? "Enviando correo de recuperación... *"
-          : "¿Has olvidado tu contraseña?"}
-      </p>
+      
+      {/* [MEJORA 6] Enlace mejorado para recuperación de contraseña */}
+      <div className="mt-4">
+        <p
+          className={`pt-2 cursor-pointer hover:text-slate-300 transition ${
+            isSendingEmail ? "text-slate-300" : "text-blue-600"
+          }`}
+          onClick={() => !isSendingEmail && handleRecoveryPassword()}
+        >
+          {isSendingEmail ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Enviando correo de recuperación...
+            </span>
+          ) : (
+            "¿Has olvidado tu contraseña?"
+          )}
+        </p>
+      </div>
+      
+      {/* [MEJORA 7] Modal de recuperación de contraseña */}
+      <PasswordRecoveryModal />
     </div>
   );
 };

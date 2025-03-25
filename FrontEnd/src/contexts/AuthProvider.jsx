@@ -5,16 +5,24 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [resetPasswordModal, setResetPasswordModal] = useState({
+    open: false,
+    email: "",
+    token: "",
+    step: 1, // 1: ingresar token, 2: nueva contraseña
+    newPassword: "",
+    confirmPassword: "",
+  });
   let logoutTimer;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("_id"); // Recupera el _id del localStorage
+    const userId = localStorage.getItem("_id");
 
     if (!token || !userId) return;
   }, []);
-
-  const signUp = async (userData) => {
+  
+const signUp = async (userData) => {
     try {
       const response = await fetch("http://localhost:4000/api/registro", {
         method: "POST",
@@ -88,7 +96,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  //Recuperación de contraseña
+  // Función para solicitar recuperación de contraseña
   const solicitarRecuperacion = async (email) => {
     try {
       const response = await fetch(
@@ -96,25 +104,118 @@ export const AuthProvider = ({ children }) => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(email)
+          body: JSON.stringify({ email }),
         }
       );
 
       const data = await response.json();
-      toast.success(data.mensaje);
+      
+      if (response.ok) {
+        toast.success(data.mensaje);
+        setResetPasswordModal({
+          open: true,
+          email: email,
+          token: "",
+          step: 1,
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        toast.error(data.mensaje || "Error al solicitar recuperación");
+      }
     } catch (error) {
-      toast.error("Error al enviar el correo de recuperacion de contraseña.");
-      console.error(
-        "Error al enviar el correo de recuperacion de contraseña:",
-        error
-      );
-      return { status: 500, data: { message: "Error de servidor" } };
+      toast.error("Error al enviar el correo de recuperación");
+      console.error("Error al enviar el correo:", error);
     }
+  };
+
+  // Función para reenviar el token
+  const reenviarToken = async () => {
+    return await solicitarRecuperacion(resetPasswordModal.email);
+  };
+
+  // Función para verificar el token
+  const verificarToken = async () => {
+    try {
+      // Aquí podrías hacer una verificación preliminar si lo deseas
+      // Por ahora solo avanzamos al paso 2
+      setResetPasswordModal(prev => ({
+        ...prev,
+        step: 2,
+      }));
+    } catch (error) {
+      toast.error("Error al verificar el token");
+      console.error("Error al verificar token:", error);
+    }
+  };
+
+  // Función para cambiar la contraseña
+  const cambiarContrasena = async () => {
+    const { token, newPassword, email } = resetPasswordModal;
+
+    if (newPassword !== resetPasswordModal.confirmPassword) {
+      toast.error("Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/reset-password/${token}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nuevaContrasena: newPassword }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.mensaje);
+        setResetPasswordModal({
+          open: false,
+          email: "",
+          token: "",
+          step: 1,
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        toast.error(data.mensaje || "Error al cambiar la contraseña");
+      }
+    } catch (error) {
+      toast.error("Error al cambiar la contraseña");
+      console.error("Error al cambiar contraseña:", error);
+    }
+  };
+
+  // Función para cerrar el modal
+  const cerrarModalRecuperacion = () => {
+    setResetPasswordModal({
+      open: false,
+      email: "",
+      token: "",
+      step: 1,
+      newPassword: "",
+      confirmPassword: "",
+    });
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, signUp, signIn, logout, solicitarRecuperacion }}
+      value={{
+        user,
+        signUp,
+        signIn,
+        logout,
+        solicitarRecuperacion,
+        resetPasswordModal,
+        setResetPasswordModal,
+        reenviarToken,
+        verificarToken,
+        cambiarContrasena,
+        cerrarModalRecuperacion,
+      }}
     >
       {children}
     </AuthContext.Provider>
