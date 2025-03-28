@@ -1,31 +1,69 @@
 const Inscripcion = require("../models/InscripModel");
+const mongoose = require('mongoose');
 
 // Crear una nueva inscripción
 const createInscripcion = async (req, res) => {
   try {
     const { Atleta, Competencia, Prueba } = req.body;
 
-    // Verificar si ya existe una inscripción para este atleta en la misma prueba
-    const inscripcionExistente = await Inscripcion.findOne({
-      Atleta,
-      Competencia,
-      Prueba,
-    });
-
-    if (inscripcionExistente) {
-      return res.status(400).json({ message: "El atleta ya está inscrito en esta prueba." });
+    // Validación de campos requeridos
+    if (!Atleta || !Competencia || !Prueba) {
+      console.error('Campos faltantes en la solicitud');
+      return res.status(400).json({
+        success: false,
+        message: "Faltan campos requeridos",
+        missing: {
+          Atleta: !Atleta,
+          Competencia: !Competencia,
+          Prueba: !Prueba
+        }
+      });
     }
 
+    // Validación de formatos de ID
+    if (!mongoose.isValidObjectId(Atleta) || 
+        !mongoose.isValidObjectId(Competencia) || 
+        !mongoose.isValidObjectId(Prueba)) {
+      console.error('IDs no válidos');
+      return res.status(400).json({
+        success: false,
+        message: "Formato de ID no válido"
+      });
+    }
+
+    // Verificar duplicados
+    const existeInscripcion = await Inscripcion.findOne({ Atleta, Competencia, Prueba });
+    if (existeInscripcion) {
+      console.error('Inscripción duplicada detectada');
+      return res.status(400).json({
+        success: false,
+        message: "El atleta ya está inscrito en esta prueba"
+      });
+    }
+
+    // Crear nueva inscripción
     const nuevaInscripcion = new Inscripcion({
       Atleta,
       Competencia,
-      Prueba,
+      Prueba
     });
 
-    await nuevaInscripcion.save();
-    res.status(201).json(nuevaInscripcion);
+    const inscripcionGuardada = await nuevaInscripcion.save();
+    console.log('Inscripción guardada exitosamente:');
+
+    res.status(201).json({
+      success: true,
+      message: "Inscripción creada exitosamente",
+      data: inscripcionGuardada
+    });
+
   } catch (error) {
-    res.status(400).json({ message: "Error al crear la inscripción", error });
+    console.error('Error en el servidor:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+      error: error.message
+    });
   }
 };
 

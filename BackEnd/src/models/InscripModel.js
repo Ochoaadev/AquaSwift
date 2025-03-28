@@ -1,30 +1,33 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const InscripcionSchema = new mongoose.Schema({
   Atleta: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Atleta", 
-    required: true,
+    ref: "Atletas",
+    required: true
   },
   Competencia: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Competencia",
-    required: true,
+    ref: "Competencias",
+    required: true
   },
   Prueba: {
-    type: mongoose.Schema.Types.ObjectId, // Relación con la prueba
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Pruebas",
-    required: true,
+    required: true
   },
   FechaInscripcion: {
     type: Date,
-    default: Date.now, // Fecha automática al momento de la inscripción
+    default: Date.now
   },
   Estado: {
     type: String,
-    enum: ["Pendiente", "Aprobada", "Rechazada"], // Estados posibles
-    default: "Pendiente",
-  },
+    enum: ["Pendiente", "Aprobada", "Rechazada"],
+    default: "Pendiente"
+  }
 });
 
-module.exprots = mongoose.model("Inscripcion", InscripcionSchema);
+// Agregar índice compuesto para evitar duplicados
+InscripcionSchema.index({ Atleta: 1, Competencia: 1, Prueba: 1 }, { unique: true });
+
+module.exports = mongoose.model('Inscripciones', InscripcionSchema);

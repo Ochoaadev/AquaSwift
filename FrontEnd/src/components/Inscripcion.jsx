@@ -1,22 +1,176 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { api } from '../service/apiService';
+import {ModalCustom} from '../components/ModalCustom';
 
-const Inscripcion = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-  
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 text-black">
-        <div className="bg-white p-5 rounded-lg shadow-lg w-80 relative z-50">
-          <h2 className="text-xl font-bold text-center">Inscripcion</h2>
-          <button
-            onClick={onClose}
-            className="mt-4 w-full bg-red-600 text-white py-2 rounded-lg font-bold"
-          >
-            Cerrar
-          </button>
+const Inscripcion = ({ isOpen, onClose, competencia }) => {
+  const [pruebas, setPruebas] = useState([]);
+  const [selectedPruebas, setSelectedPruebas] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const userId = localStorage.getItem('_id');
+
+  useEffect(() => {
+    if (isOpen && competencia?._id) {
+      fetchPruebas();
+      fetchInscripcionesExistentes();
+    }
+  }, [isOpen, competencia]);
+
+  const fetchPruebas = async () => {
+    try {
+      const response = await api.prueba.getByCompetencia(competencia._id);
+      setPruebas(response);
+    } catch (err) {
+      setError('Error al cargar las pruebas disponibles');
+      console.error(err);
+    }
+  };
+
+  const fetchInscripcionesExistentes = async () => {
+    try {
+      const inscripciones = await api.inscripcion.getByAtleta(userId);
+      const pruebasInscritas = inscripciones
+        .filter(i => i.Competencia._id === competencia._id)
+        .map(i => i.Prueba._id);
+      
+      setSelectedPruebas(pruebasInscritas);
+    } catch (err) {
+      console.error('Error al verificar inscripciones existentes:', err);
+    }
+  };
+
+  const handlePruebaSelection = (pruebaId) => {
+    setSelectedPruebas(prev => {
+      // Si ya está seleccionada, la removemos
+      if (prev.includes(pruebaId)) {
+        return prev.filter(id => id !== pruebaId);
+      }
+      
+      // Si ya hay 4 seleccionadas, mostramos error y no agregamos
+      if (prev.length >= 4) {
+        setError('Máximo puedes seleccionar 4 pruebas');
+        return prev;
+      }
+      
+      // Agregamos la nueva prueba
+      return [...prev, pruebaId];
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (selectedPruebas.length === 0) {
+      setError('Debes seleccionar al menos una prueba');
+      return;
+    }
+
+    // Validación adicional del límite (por si acaso)
+    if (selectedPruebas.length > 4) {
+      setError('No puedes inscribirte en más de 4 pruebas');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Filtrar solo pruebas no inscritas previamente
+      const nuevasPruebas = selectedPruebas.filter(pruebaId => 
+        !selectedPruebas.includes(pruebaId)
+      );
+
+      // Crear una inscripción por cada prueba seleccionada
+      const promises = nuevasPruebas.map(pruebaId => 
+        api.inscripcion.create({
+          Atleta: userId,
+          Competencia: competencia._id,
+          Prueba: pruebaId
+        })
+      );
+
+      await Promise.all(promises);
+      setSuccess(true);
+      setTimeout(() => {
+        onClose();
+        setSuccess(false);
+      }, 2000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al realizar la inscripción');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <ModalCustom
+      title={`Inscripción a ${competencia?.Nombre || 'Competencia'}`}
+      type="form"
+      onClose={onClose}
+      onConfirm={handleSubmit}
+      confirmText={loading ? 'Procesando...' : 'Confirmar Inscripción'}
+      cancelText="Cancelar"
+    >
+      <div className="space-y-4">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            ¡Inscripción exitosa!
+          </div>
+        )}
+
+        {/* Mensaje informativo y contador */}
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded">
+          <p>Puedes seleccionar hasta 4 pruebas como máximo</p>
+          <p className="text-right font-medium">Seleccionadas: {selectedPruebas.length}/4</p>
+        </div>
+
+        <p className="text-gray-700 mb-4">
+          Selecciona las pruebas en las que deseas participar:
+        </p>
+
+        <div className="max-h-60 overflow-y-auto">
+          {pruebas.length === 0 ? (
+            <p className="text-gray-500">No hay pruebas disponibles para esta competencia</p>
+          ) : (
+            <ul className="space-y-2">
+              {pruebas.map(prueba => (
+                <li key={prueba._id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`prueba-${prueba._id}`}
+                    checked={selectedPruebas.includes(prueba._id)}
+                    onChange={() => handlePruebaSelection(prueba._id)}
+                    className="mr-2 h-5 w-5 text-primary-100 rounded focus:ring-primary-100"
+                    disabled={
+                      // Deshabilitar si ya está inscrito o si hay 4 seleccionadas y esta no es una de ellas
+                      (selectedPruebas.includes(prueba._id) && 
+                        selectedPruebas.findIndex(id => id === prueba._id) < 
+                        pruebas.length - (pruebas.length - selectedPruebas.length)) ||
+                      (selectedPruebas.length >= 4 && !selectedPruebas.includes(prueba._id))
+                    }
+                  />
+                  <label htmlFor={`prueba-${prueba._id}`} className="text-gray-700">
+                    {prueba.Nombre} ({prueba.Genero})
+                    {selectedPruebas.includes(prueba._id) && (
+                      <span className="ml-2 text-green-500 text-sm">✓ Inscrito</span>
+                    )}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
-    );
-  };
-  
-  export default Inscripcion;
-  
+    </ModalCustom>
+  );
+};
+
+export default Inscripcion;

@@ -32,15 +32,20 @@ const UserHome = () => {
 
   return (
     <>
-      {/* Modales de Más Info y Inscripción */}
       {competenciaSeleccionada && (
-        <MasInfo 
-          isOpen={modalType === 'info'} 
-          onClose={() => setModalType(null)} 
-          pruebas={competenciaSeleccionada.Pruebas || []} 
-        />
-      )}
-      <Inscripcion isOpen={modalType === 'inscripcion'} onClose={() => setModalType(null)} />
+  <>
+     <MasInfo 
+            isOpen={modalType === 'info'} 
+            onClose={() => setModalType(null)} 
+            pruebas={competenciaSeleccionada.Pruebas || []} 
+          />
+          <Inscripcion 
+            isOpen={modalType === 'inscripcion'} 
+            onClose={() => setModalType(null)}
+            competencia={competenciaSeleccionada}
+          />
+  </>
+)}
 
       <div className='mx-auto w-5/6 my-5'>
         <div className='text-center my-4 text-2xl lg:text-4xl md:text-3xl'>
@@ -80,8 +85,13 @@ const UserHome = () => {
 
 const CompetenciaCard = ({ competencia, bgColorClass, setModalType, setCompetenciaSeleccionada }) => {
   const handleMoreInfoClick = () => {
-    setCompetenciaSeleccionada(competencia); // Pasar la competencia seleccionada
-    setModalType('info'); // Abre el modal de Más Info
+    setCompetenciaSeleccionada(competencia);
+    setModalType('info');
+  };
+
+  const handleInscripcionClick = () => {
+    setCompetenciaSeleccionada(competencia);
+    setModalType('inscripcion');
   };
 
   return (
@@ -103,7 +113,7 @@ const CompetenciaCard = ({ competencia, bgColorClass, setModalType, setCompetenc
               Más Info
             </button>
 
-            <button onClick={() => setModalType('inscripcion')} className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl transition hover:scale-105 duration-200">
+            <button onClick={handleInscripcionClick} className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl transition hover:scale-105 duration-200">
               Inscribirme
             </button>
           </div>

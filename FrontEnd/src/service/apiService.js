@@ -44,6 +44,18 @@ const updateCompetencia = async (id, data, token = null) => {
   return request(`/api/competencias/${id}`, 'PUT', data, token);
 };
 
+const createInscripcion = async (data, token = null) => {
+  return request('/api/inscripciones', 'POST', data, token);
+};
+
+const getPruebasByCompetencia = async (competenciaId, token = null) => {
+  return request(`/api/pruebas/competencia/${competenciaId}`, 'GET', null, token);
+};
+
+const getInscripcionesByAtleta = async (atletaId, token = null) => {
+  return request(`/api/inscripciones/atleta/${atletaId}`, 'GET', null, token);
+};
+
 export const api = {
   auth: {
     register: (data) => request('/auth/register', 'POST', data),
@@ -58,5 +70,12 @@ export const api = {
   competencia: {
     deleteCompetencia,
     updateCompetencia,
+  },
+  inscripcion: {
+    create: createInscripcion,
+    getByAtleta: getInscripcionesByAtleta,
+  },
+  prueba: {
+    getByCompetencia: getPruebasByCompetencia,
   },
 };
