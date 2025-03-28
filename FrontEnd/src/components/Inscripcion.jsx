@@ -42,19 +42,11 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
 
   const handlePruebaSelection = (pruebaId) => {
     setSelectedPruebas(prev => {
-      // Si ya está seleccionada, la removemos
       if (prev.includes(pruebaId)) {
         return prev.filter(id => id !== pruebaId);
+      } else {
+        return [...prev, pruebaId];
       }
-      
-      // Si ya hay 4 seleccionadas, mostramos error y no agregamos
-      if (prev.length >= 4) {
-        setError('Máximo puedes seleccionar 4 pruebas');
-        return prev;
-      }
-      
-      // Agregamos la nueva prueba
-      return [...prev, pruebaId];
     });
   };
 
@@ -64,7 +56,6 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
       return;
     }
 
-    // Validación adicional del límite (por si acaso)
     if (selectedPruebas.length > 4) {
       setError('No puedes inscribirte en más de 4 pruebas');
       return;
@@ -74,13 +65,8 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
     setError(null);
 
     try {
-      // Filtrar solo pruebas no inscritas previamente
-      const nuevasPruebas = selectedPruebas.filter(pruebaId => 
-        !selectedPruebas.includes(pruebaId)
-      );
-
       // Crear una inscripción por cada prueba seleccionada
-      const promises = nuevasPruebas.map(pruebaId => 
+      const promises = selectedPruebas.map(pruebaId => 
         api.inscripcion.create({
           Atleta: userId,
           Competencia: competencia._id,
@@ -126,12 +112,14 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
           </div>
         )}
 
-        {/* Mensaje informativo y contador */}
-        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded">
-          <p>Puedes seleccionar hasta 4 pruebas como máximo</p>
-          <p className="text-right font-medium">Seleccionadas: {selectedPruebas.length}/4</p>
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded mb-2">
+          Puedes seleccionar hasta 4 pruebas como máximo
         </div>
 
+        <div className="text-right text-sm font-medium">
+          Seleccionadas: {selectedPruebas.length}/4
+        </div>
+        
         <p className="text-gray-700 mb-4">
           Selecciona las pruebas en las que deseas participar:
         </p>
@@ -149,13 +137,9 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
                     checked={selectedPruebas.includes(prueba._id)}
                     onChange={() => handlePruebaSelection(prueba._id)}
                     className="mr-2 h-5 w-5 text-primary-100 rounded focus:ring-primary-100"
-                    disabled={
-                      // Deshabilitar si ya está inscrito o si hay 4 seleccionadas y esta no es una de ellas
-                      (selectedPruebas.includes(prueba._id) && 
-                        selectedPruebas.findIndex(id => id === prueba._id) < 
-                        pruebas.length - (pruebas.length - selectedPruebas.length)) ||
-                      (selectedPruebas.length >= 4 && !selectedPruebas.includes(prueba._id))
-                    }
+                    disabled={selectedPruebas.includes(prueba._id) && 
+                              selectedPruebas.findIndex(id => id === prueba._id) < 
+                              pruebas.length - (pruebas.length - selectedPruebas.length)}
                   />
                   <label htmlFor={`prueba-${prueba._id}`} className="text-gray-700">
                     {prueba.Nombre} ({prueba.Genero})

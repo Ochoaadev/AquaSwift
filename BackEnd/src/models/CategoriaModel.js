@@ -7,7 +7,7 @@ const CategoriaSchema = new schema({
         required: true
     },
     Edad:{
-        type: Number,
+        type: String,
         required: true
     },
     Genero:{

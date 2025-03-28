@@ -20,11 +20,6 @@ const InscripcionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  Estado: {
-    type: String,
-    enum: ["Pendiente", "Aprobada", "Rechazada"],
-    default: "Pendiente"
-  }
 });
 
 // Agregar índice compuesto para evitar duplicados
