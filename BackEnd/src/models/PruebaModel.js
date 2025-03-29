@@ -14,7 +14,7 @@ const PruebaSchema = new Schema({
     type: String,
     required: true
   },
-  Competencia: {
+  Competencias: {
     type: [Schema.Types.ObjectId],  // Array de ObjectIds
     ref: "Competencias",
     required: true,

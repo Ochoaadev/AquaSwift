@@ -17,6 +17,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json({ limit: '5mb' })); // Limitar el tamaño del cuerpo de la solicitud a 5MB
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
+
 
 app.use('/api', routes);
 

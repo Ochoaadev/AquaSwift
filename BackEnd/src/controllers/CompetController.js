@@ -27,8 +27,7 @@ const getByIdCompet = async (req, res) => {
   };
   
 
-// Crear una nueva competencia
-const CreateCompet = async (req, res) => {
+  const CreateCompet = async (req, res) => {
     let imagenData = null;
   
     try {
@@ -45,9 +44,10 @@ const CreateCompet = async (req, res) => {
       // Obtener pruebas seleccionadas desde el body
       const pruebasSeleccionadas = Array.isArray(req.body.Pruebas) ? req.body.Pruebas : [];
   
+      // Aquí es donde el error puede estar ocurriendo, asegúrate de que el nombre sea correcto
       const nuevaCompetencia = new Competencia({
         ...req.body,
-        Pruebas: pruebasSeleccionadas, // Guardar solo las pruebas seleccionadas
+        Pruebas: pruebasSeleccionadas,  // Asegúrate de que 'Pruebas' esté correctamente definido
         Imagen: imagenData
       });
   
@@ -63,6 +63,7 @@ const CreateCompet = async (req, res) => {
       res.status(400).json({ message: 'Error al crear la competencia', error: error.message });
     }
   };
+  
   
 
 const UpdateCompet = async (req, res) => {

@@ -2,29 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useUpItemsContext, useCategoriasContext } from "../contexts/UpProvider";
 import { useLocation } from "react-router-dom";
 
-const pruebasNatacion = {
-  "Libre": [
-    "50 mts libre", "100 mts libre", "200 mts libre", "400 mts libre", "800 mts libre", "1500 mts libre"
-  ],
-  "Espalda": [
-    "50 mts espalda", "100 mts espalda", "200 mts espalda"
-  ],
-  "Pecho": [
-    "50 mts pecho", "100 mts pecho", "200 mts pecho"
-  ],
-  "Mariposa": [
-    "50 mts fly", "100 mts fly", "200 mts fly"
-  ],
-  "Combinado": [
-    "200 mts C.I", "400 mts C.I"
-  ]
-};
-
-const pruebasAcuatlon = ["3 km", "5 km", "6 km", "8 km"];
-const pruebasTriatlon = ["26 km", "52 km", "113 km"];
-
-
-
 const AgregarCompetencia = () => {
   const location = useLocation();
   const [nombre, setNombre] = useState("");
@@ -33,7 +10,8 @@ const AgregarCompetencia = () => {
   const [categoriaId, setCategoriaId] = useState("");
   const [genero, setGenero] = useState("");
   const [imagen, setImagen] = useState(null);
-  const [pruebas, setPruebas] = useState([]); // Estado para almacenar pruebas seleccionadas
+  const [pruebas, setPruebas] = useState([]); // Estado para almacenar las pruebas desde la DB
+  const [pruebasSeleccionadas, setPruebasSeleccionadas] = useState([]); // Estado para las pruebas seleccionadas
   const [estilo, setEstilo] = useState(""); // Estado para manejar el estilo seleccionado
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,7 +34,23 @@ const AgregarCompetencia = () => {
       setDisciplina(disciplinaFija);
     }
   }, [disciplinaFija]);
-  
+
+  useEffect(() => {
+    if (!disciplina) return;  // Si no hay disciplina seleccionada, no hace nada
+
+    const fetchPruebas = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/pruebas?disciplina=${disciplina}`);
+        const data = await response.json();
+        setPruebas(data); // Guardar las pruebas en el estado
+      } catch (error) {
+        console.error("Error al obtener pruebas:", error);
+        setError("Error al obtener pruebas");
+      }
+    };
+
+    fetchPruebas();
+  }, [disciplina]);
 
   const limpiarFormulario = () => {
     setNombre("");
@@ -65,18 +59,24 @@ const AgregarCompetencia = () => {
     setCategoriaId("");
     setGenero("");
     setImagen(null);
-    setPruebas([]);
+    setPruebasSeleccionadas([]);
     setEstilo(""); // Limpiar el estilo seleccionado
     setError("");
     setModalOpen(false);
   };
 
   const handleCheckboxChange = (prueba) => {
-    setPruebas((prev) =>
-      prev.includes(prueba) ? prev.filter((p) => p !== prueba) : [...prev, prueba]
-    );
+    setPruebasSeleccionadas((prev) => {
+      if (prev.some(p => p._id === prueba._id)) {
+        // Si la prueba ya está seleccionada, eliminarla
+        return prev.filter(p => p._id !== prueba._id);
+      } else {
+        // Agregar la prueba seleccionada por su id
+        return [...prev, prueba];
+      }
+    });
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -88,10 +88,10 @@ const AgregarCompetencia = () => {
     formData.append("Disciplina", disciplinaFija || disciplina);
     formData.append("Categoria", categoriaId);
     formData.append("Genero", genero);
-    
-    // Asegurar que las pruebas se envíen correctamente
-    pruebas.forEach((prueba) => {
-      formData.append("Pruebas[]", prueba); // Enviar cada prueba como un campo separado
+  
+    // Enviar solo las pruebas seleccionadas (por id)
+    pruebasSeleccionadas.forEach((prueba) => {
+      formData.append("Pruebas[]", prueba.Nombre); // Enviar solo el Nombre
     });
   
     if (imagen) {
@@ -101,9 +101,6 @@ const AgregarCompetencia = () => {
     try {
       const response = await fetch("http://localhost:4000/api/competencias", {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: formData,
       });
   
@@ -121,6 +118,9 @@ const AgregarCompetencia = () => {
       setLoading(false);
     }
   };
+  
+  
+  
 
   return (
     <div className="p-6 mx-auto poppins">
@@ -202,84 +202,27 @@ const AgregarCompetencia = () => {
                 required
               />
 
-              {/* Sección para selección de pruebas en natación */}
-              {disciplina === "Natacion" && (
-                <div className="w-full p-2 border rounded-xl">
-                  <label htmlFor="estilo" className="block font-semibold">Selecciona el estilo:</label>
-                  <select
-                    id="estilo"
-                    value={estilo}
-                    onChange={(e) => setEstilo(e.target.value)}
-                    className="w-full p-2 border rounded-xl"
-                  >
-                    <option value="">Seleccione un estilo</option>
-                    {Object.keys(pruebasNatacion).map((key) => (
-                      <option key={key} value={key}>{key}</option>
-                    ))}
-                  </select>
+              {/* Mostrar pruebas según la disciplina seleccionada */}
+              {disciplina && (
+                <div className="border p-2 rounded-xl mt-4">
+                  <label className="block font-semibold">Selecciona las pruebas:</label>
+                  <div className="grid grid-cols-2 gap-2">
+                  {pruebas.map((prueba) => (
+    <label key={prueba._id} className="flex items-center space-x-2">
+      <input
+        type="checkbox"
+        value={prueba._id}
+        checked={pruebasSeleccionadas.some(p => p._id === prueba._id)} // Revisar si está seleccionado
+        onChange={() => handleCheckboxChange(prueba)} // Cambiar a pasar la prueba completa
+        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500" // Clases de estilo para el checkbox
+      />
+      <span className="text-primary-600">{prueba.Nombre}</span>
+    </label>
+  ))}
+
+                  </div>
                 </div>
               )}
-
-              {/* Mostrar pruebas según el estilo seleccionado en Natación */}
-{(disciplinaFija === "Natacion" || disciplina === "Natacion") && estilo && (
-  <div className="border p-2 rounded-xl mt-4">
-    <label className="block font-semibold">Selecciona las pruebas:</label>
-    <div className="grid grid-cols-2 gap-2">
-      {pruebasNatacion[estilo].map((prueba) => (
-        <label key={prueba} className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            value={prueba}
-            checked={pruebas.includes(prueba)}
-            onChange={() => handleCheckboxChange(prueba)}
-          />
-          <span className="text-primary-600">{prueba}</span>
-        </label>
-      ))}
-    </div>
-  </div>
-)}
-
-{/* Sección de pruebas para Acuatlón */}
-{(disciplinaFija === "Acuatlon" || disciplina === "Acuatlon") && (
-  <div className="border p-2 rounded-xl mt-4">
-    <label className="block font-semibold">Selecciona las pruebas:</label>
-    <div className="grid grid-cols-2 gap-2">
-      {pruebasAcuatlon.map((prueba) => (
-        <label key={prueba} className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            value={prueba}
-            checked={pruebas.includes(prueba)}
-            onChange={() => handleCheckboxChange(prueba)}
-          />
-          <span className="text-primary-600">{prueba}</span>
-        </label>
-      ))}
-    </div>
-  </div>
-)}
-
-{/* Sección de pruebas para Triatlón */}
-{(disciplinaFija === "Triatlon" || disciplina === "Triatlon") && (
-  <div className="border p-2 rounded-xl mt-4">
-    <label className="block font-semibold">Selecciona las pruebas:</label>
-    <div className="grid grid-cols-2 gap-2">
-      {pruebasTriatlon.map((prueba) => (
-        <label key={prueba} className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            value={prueba}
-            checked={pruebas.includes(prueba)}
-            onChange={() => handleCheckboxChange(prueba)}
-          />
-          <span className="text-primary-600">{prueba}</span>
-        </label>
-      ))}
-    </div>
-  </div>
-)}
-
 
               {error && <p className="text-red-700 text-center">{error}</p>}
 

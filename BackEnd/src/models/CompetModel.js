@@ -29,9 +29,9 @@ const CompetenciaSchema = new schema({
     type: schema.Types.ObjectId
   }],
   Pruebas: [{
-    type: schema.Types.ObjectId,
-    ref: "Prueba"
+    type: String  
   }]
 });
+
 
 module.exports = mongoose.model('Competencias', CompetenciaSchema);
