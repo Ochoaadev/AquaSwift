@@ -1,64 +1,87 @@
-// controllers/pruebaController.js
-const Prueba = require("../models/PruebaModel");
+const Prueba = require('../models/PruebaModel');
 
-// Crear una nueva prueba
-const createPrueba = async (req, res) => {
+// Crear una nueva prueba asociada a una o más competencias
+exports.createPrueba = async (req, res) => {
   try {
-    const { Nombre, Competencia, Genero, Categoria } = req.body;
+    const { Nombre, Disciplina, Estilo, Competencias } = req.body;
+    
     const nuevaPrueba = new Prueba({
       Nombre,
-      Competencia,
-      Genero,
-      Categoria,
+      Disciplina,
+      Estilo,
+      Competencias: Array.isArray(Competencias) ? Competencias : [Competencias] // Asegura que sea array
     });
-    await nuevaPrueba.save();
-    res.status(201).json(nuevaPrueba);
+
+    const pruebaGuardada = await nuevaPrueba.save();
+    res.status(201).json(pruebaGuardada);
   } catch (error) {
-    res.status(400).json({ message: "Error al crear la prueba", error });
+    res.status(400).json({ message: error.message });
   }
 };
 
-// Obtener todas las pruebas de una competencia
-const getPruebasByCompetencia = async (req, res) => {
+// Obtener todas las pruebas (pueden pertenecer a múltiples competencias)
+exports.getPruebas = async (req, res) => {
+  try {
+    const pruebas = await Prueba.find().populate('Competencias');
+    res.json(pruebas);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener pruebas por competencia específica
+exports.getPruebasByCompetencia = async (req, res) => {
   try {
     const { competenciaId } = req.params;
-    const pruebas = await Prueba.find({ Competencia: competenciaId }).populate("Categoria");
-    res.status(200).json(pruebas);
+    const pruebas = await Prueba.find({ Competencias: competenciaId });
+    res.json(pruebas);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener las pruebas", error });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Actualizar una prueba
-const updatePrueba = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { Nombre, Distancia, Estilo, Genero, Categoria } = req.body;
-    const pruebaActualizada = await Prueba.findByIdAndUpdate(
-      id,
-      { Nombre, Distancia, Estilo, Genero, Categoria },
-      { new: true }
-    );
-    res.status(200).json(pruebaActualizada);
-  } catch (error) {
-    res.status(400).json({ message: "Error al actualizar la prueba", error });
-  }
-};
 
-// Eliminar una prueba
-const deletePrueba = async (req, res) => {
+exports.deletePrueba = async (req, res) => {
   try {
     const { id } = req.params;
     await Prueba.findByIdAndDelete(id);
-    res.status(200).json({ message: "Prueba eliminada correctamente" });
+    res.json({ message: 'Prueba eliminada de todas las competencias' });
   } catch (error) {
-    res.status(500).json({ message: "Error al eliminar la prueba", error });
+    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = {
-  createPrueba,
-  getPruebasByCompetencia,
-  updatePrueba,
-  deletePrueba,
+// Añadir una competencia adicional a una prueba existente
+exports.addCompetenciaToPrueba = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { competenciaId } = req.body;
+    
+    const prueba = await Prueba.findByIdAndUpdate(
+      id,
+      { $addToSet: { Competencias: competenciaId } }, 
+      { new: true }
+    );
+    
+    res.json(prueba);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Remover una competencia específica de una prueba
+exports.removeCompetenciaFromPrueba = async (req, res) => {
+  try {
+    const { id, competenciaId } = req.params;
+    
+    const prueba = await Prueba.findByIdAndUpdate(
+      id,
+      { $pull: { Competencias: competenciaId } },
+      { new: true }
+    );
+    
+    res.json(prueba);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };

@@ -53,6 +53,7 @@ const CreateCompet = async (req, res) => {
   
       const competenciaGuardada = await nuevaCompetencia.save();
       res.status(201).json(competenciaGuardada);
+      console.log(competenciaGuardada);
   
     } catch (error) {
       console.error('Error en CreateCompet:', error);

@@ -101,6 +101,9 @@ const AgregarCompetencia = () => {
     try {
       const response = await fetch("http://localhost:4000/api/competencias", {
         method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: formData,
       });
   

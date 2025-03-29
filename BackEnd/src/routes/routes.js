@@ -9,7 +9,7 @@ const {signIn, signUp, logout} = require('../controllers/User/Login-register')
 const {CreateCompet, DeleteCompet, UpdateCompet, getAllCompet, getByIdCompet} = require('../controllers/CompetController');
 const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, updateCategoria} = require('../controllers/CategoriaController')
 const {createInscripcion, getAllInscripciones, getInscripcionesByAtleta, getInscripcionesByCompetencia, getInscripcionesByPrueba, updateInscripcion, deleteInscripcion} = require('../controllers/InscripController');
-const {createPrueba, getPruebasByCompetencia, deletePrueba, updatePrueba} = require('../controllers/PruebaController');
+const {createPrueba, getPruebas, getPruebasByCompetencia, deletePrueba, addCompetenciaToPrueba, removeCompetenciaFromPrueba} = require('../controllers/PruebaController');
 const {solicitarRecuperacion, cambiarContrasena} = require('../controllers/User/RestorePassword')
 
 //Filtro de busqueda
@@ -95,9 +95,14 @@ router.delete("/inscripciones/:id", deleteInscripcion);
 //Pruebas
 
 router.post("/pruebas", createPrueba);
+router.get("/pruebas/", getPruebas)
 router.get("/pruebas/competencia/:competenciaId", getPruebasByCompetencia);
-router.put("/pruebas/:id", updatePrueba);
 router.delete("/pruebas/:id", deletePrueba);
+
+// Rutas específicas para manejo de competencias
+router.get('/pruebas/competencia/:competenciaId', getPruebasByCompetencia); // Obtener pruebas por competencia
+router.post('/pruebas/:id/competencias', addCompetenciaToPrueba); // Añadir competencia a prueba
+router.delete('/pruebas/:id/competencias/:competenciaId', removeCompetenciaFromPrueba); // Remover competencia de prueba
 
 //Recuperación de contraseña
 
@@ -105,4 +110,3 @@ router.post('/solicitar-recuperacion', solicitarRecuperacion);
 router.post('/reset-password/:token', cambiarContrasena);
 
 module.exports = router
-
