@@ -29,7 +29,8 @@ const CompetenciaSchema = new schema({
     type: schema.Types.ObjectId
   }],
   Pruebas: [{
-    type: String  
+    type: schema.Types.ObjectId,
+    ref: "Pruebas" 
   }]
 });
 

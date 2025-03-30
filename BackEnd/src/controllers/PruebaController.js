@@ -33,7 +33,9 @@ exports.getPruebas = async (req, res) => {
 exports.getPruebasByCompetencia = async (req, res) => {
   try {
     const { competenciaId } = req.params;
-    const pruebas = await Prueba.find({ Competencias: competenciaId });
+    const pruebas = await Prueba.find({ Competencias: competenciaId })
+      .populate('Competencias', 'Nombre Fecha'); // Opcional: trae datos básicos de competencias
+    
     res.json(pruebas);
   } catch (error) {
     res.status(500).json({ message: error.message });
