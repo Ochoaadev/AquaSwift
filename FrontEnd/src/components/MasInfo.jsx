@@ -1,38 +1,98 @@
-const MasInfo = ({ isOpen, onClose, pruebas }) => {
+import React, { useState, useEffect } from 'react';
+import { api } from '../service/apiService';
+import { ModalCustom } from '../components/ModalCustom';
+
+const MasInfo = ({ isOpen, onClose, competencia }) => {
+  const [pruebas, setPruebas] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && competencia?._id) {
+      fetchPruebas();
+    }
+  }, [isOpen, competencia]);
+
+  const fetchPruebas = async () => {
+    try {
+      setLoading(true);
+      const response = await api.prueba.getByCompetencia(competencia._id);
+      
+      // Ordenar pruebas por nombre
+      const pruebasOrdenadas = response.sort((a, b) => 
+        a.Nombre.localeCompare(b.Nombre)
+      );
+      
+      setPruebas(pruebasOrdenadas);
+      setError(null);
+    } catch (err) {
+      setError('Error al cargar las pruebas disponibles');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
-  // Asegurarse de que 'pruebas' siempre sea un arreglo (vacío si no se pasó correctamente)
-  const pruebasValidas = Array.isArray(pruebas) ? pruebas : [];
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 text-black">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-5/6 lg:w-6/12 md:w-8/12 relative z-50">
-        <h2 className="text-xl font-bold text-center">Pruebas Disponibles</h2>
-        {/* Mostrar las pruebas */}
-        <div className="mt-4">
-          {pruebasValidas.length === 0 ? (
-            <p className="text-center text-gray-500">No hay pruebas disponibles.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
-              {pruebasValidas.map((prueba, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-100 p-2 rounded-lg shadow-sm flex items-center justify-between"
-                >
-                  <span>{prueba}</span>
-                </div>
-              ))}
+    <ModalCustom
+      title={`Pruebas de ${competencia?.Nombre || 'Competencia'}`}
+      type="info" // Cambiado a tipo 'info' en lugar de 'form'
+      onClose={onClose}
+      showConfirmButton={false} // No mostrar botón de confirmar
+      cancelText="Cerrar"
+    >
+      <div className="space-y-4">
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        <div className="max-h-96 overflow-y-auto">
+          {loading ? (
+            <div className="flex justify-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-100"></div>
             </div>
+          ) : pruebas.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No hay pruebas disponibles para esta competencia</p>
+          ) : (
+            <ul className="space-y-3">
+              {pruebas.map(prueba => (
+                <li key={prueba._id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-lg text-gray-800">
+                        {prueba.Nombre}
+                      </h3>
+                      <div className="text-sm text-gray-600 mt-1">
+                        <span className="font-medium">Disciplina:</span> {prueba.Disciplina}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">Estilo:</span> {prueba.Estilo}
+                      </div>
+                      {prueba.Categoria && (
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Categoría:</span> {prueba.Categoria}
+                        </div>
+                      )}
+                    </div>
+                    {prueba.Distancia && (
+                      <div className="text-right">
+                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {prueba.Distancia}m
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
-        <button
-          onClick={onClose}
-          className="mt-4 w-full bg-red-600 text-white py-2 rounded-lg font-bold"
-        >
-          Cerrar
-        </button>
       </div>
-    </div>
+    </ModalCustom>
   );
 };
 

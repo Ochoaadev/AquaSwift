@@ -37,7 +37,7 @@ const UserHome = () => {
      <MasInfo 
             isOpen={modalType === 'info'} 
             onClose={() => setModalType(null)} 
-            pruebas={competenciaSeleccionada.Pruebas || []} 
+            competencia={competenciaSeleccionada} 
           />
           <Inscripcion 
             isOpen={modalType === 'inscripcion'} 

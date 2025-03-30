@@ -60,11 +60,25 @@ const AdminHome = () => {
 const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedCompetencia, setEditedCompetencia] = useState({ ...competencia });
-  const { fetchData } = useUpItemsContext(); // Para actualizar después de guardar
+  const { fetchData } = useUpItemsContext();
   const { categorias } = useCategoriasContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pruebasCompetencia, setPruebasCompetencia] = useState([]); // Nuevo estado para pruebas
 
+  // Función para cargar las pruebas de la competencia
+  const fetchPruebas = async () => {
+    try {
+      const response = await api.prueba.getByCompetencia(competencia._id);
+      setPruebasCompetencia(response);
+    } catch (error) {
+      console.error("Error al cargar pruebas:", error);
+    }
+  };
 
+  const handleMasInfoClick = () => {
+    fetchPruebas(); // Cargar pruebas al abrir el modal
+    setIsModalOpen(true);
+  };
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
@@ -93,7 +107,11 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
   return (
     <>
 
-    <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pruebas={competencia.Pruebas} />
+    <MasInfo 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        competencia={competencia} 
+      />
     <div className={`${bgColorClass} rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5 transition hover:scale-105 duration-200`}>
       <img
         src={competencia.Imagen?.url}
@@ -171,7 +189,7 @@ const CompetenciaCard = ({ competencia, onDelete, bgColorClass }) => {
             <p className="text-lg text-center lg:text-left"><span className="font-bold">Género: </span>{competencia.Genero}</p>
             <div className="grid grid-cols-2 lg:grid-cols-1 lg:justify-start gap-2 mt-2">
             <button 
-              onClick={() => setIsModalOpen(true)}
+                   onClick={handleMasInfoClick}
               className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-1 px-3 rounded-xl"
             >
               Más Info
