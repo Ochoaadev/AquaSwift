@@ -75,8 +75,8 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
       return;
     }
 
-    if (selectedPruebas.length > 4) {
-      setError('No puedes inscribirte en más de 4 pruebas');
+    if (selectedPruebas.length > 6) {
+      setError('No puedes inscribirte en más de 6 pruebas');
       return;
     }
 
@@ -112,9 +112,10 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
   return (
     <ModalCustom
       title={`Inscripción a ${competencia?.Nombre || 'Competencia'}`}
-      type="form"
+      type="info"
       onClose={onClose}
       onConfirm={handleSubmit}
+      className="bg-primary-100 text-white"
       confirmText={loading ? 'Procesando...' : 'Confirmar Inscripción'}
       cancelText="Cancelar"
     >
@@ -131,17 +132,13 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded mb-2">
-          Puedes seleccionar hasta 4 pruebas como máximo
+        <div className="bg-blue-50 border border-blue-200 text-primary-100 px-4 py-2 rounded mb-2 text-center">
+          Puedes seleccionar 6 pruebas como máximo
         </div>
 
-        <div className="text-right text-sm font-medium">
-          Seleccionadas: {selectedPruebas.length}/4
+        <div className="text-left text-sm font-medium">
+          Seleccionadas: {selectedPruebas.length}/6
         </div>
-        
-        <p className="text-gray-700 mb-4">
-          Selecciona las pruebas en las que deseas participar:
-        </p>
 
         <div className="max-h-60 overflow-y-auto">
           {loading ? (
@@ -155,7 +152,7 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
               {pruebas.map(prueba => {
                 const estaInscrito = pruebasInscritas.includes(prueba._id);
                 const estaSeleccionado = selectedPruebas.includes(prueba._id);
-                const puedeSeleccionar = !estaInscrito && (estaSeleccionado || selectedPruebas.length < 4);
+                const puedeSeleccionar = !estaInscrito && (estaSeleccionado || selectedPruebas.length < 6);
                 
                 return (
                   <li key={prueba._id} className="flex items-start">
@@ -178,20 +175,12 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
                           estaInscrito ? 'text-gray-500' : 'text-gray-700'
                         }`}
                       >
-                        {prueba.Nombre}
+                        {prueba.Nombre}{" "}
+                        {estaInscrito && <span className="text-blue-500">✓ Ya inscrito</span>}
                       </label>
-                      <div className="text-sm text-gray-500">
-                        {prueba.Disciplina} • {prueba.Estilo}
-                        {estaInscrito && (
-                          <span className="ml-2 text-blue-500">✓ Ya inscrito</span>
-                        )}
-                        {!estaInscrito && estaSeleccionado && (
-                          <span className="ml-2 text-green-500">✓ Seleccionada</span>
-                        )}
-                      </div>
                     </div>
                   </li>
-                );
+                );                
               })}
             </ul>
           )}

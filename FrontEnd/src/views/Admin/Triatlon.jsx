@@ -85,7 +85,11 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
 
   return (
     <>
-      <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pruebas={competencia.Pruebas} /> {/* Integrando MasInfo */}
+     <MasInfo 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        competencia={competencia} 
+      />
       <div className="bg-primary-450 transition hover:scale-105 duration-200 rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5">
         <img
           src={competencia.Imagen?.url}
@@ -145,7 +149,7 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
               <div className="grid grid-cols-2 lg:grid-cols-1 lg:justify-start gap-2 mt-2">
                 <button
                   onClick={() => setIsModalOpen(true)} // Activar modal de MasInfo
-                  className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl"
+                  className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl  transition hover:scale-105 duration-200"
                 >
                   Más Info
                 </button>

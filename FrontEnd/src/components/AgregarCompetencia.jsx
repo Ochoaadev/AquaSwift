@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useUpItemsContext, useCategoriasContext } from "../contexts/UpProvider";
 import { useLocation } from "react-router-dom";
+import showToast from './toastHelper'; 
+
 
 const AgregarCompetencia = () => {
   const [nombre, setNombre] = useState("");
@@ -19,6 +21,19 @@ const AgregarCompetencia = () => {
   const { fetchData } = useUpItemsContext();
   const { categorias, fetchCategorias } = useCategoriasContext();
 
+  const location = useLocation();
+
+  // Determinar la disciplina permitida según la ruta
+  let disciplinasDisponibles = ["Natacion", "Acuatlon", "Triatlon"];
+
+  if (location.pathname.includes("natacion")) {
+    disciplinasDisponibles = ["Natacion"];
+  } else if (location.pathname.includes("acuatlon")) {
+    disciplinasDisponibles = ["Acuatlon"];
+  } else if (location.pathname.includes("triatlon")) {
+    disciplinasDisponibles = ["Triatlon"];
+  }
+
   // Elimina la parte que asigna disciplina según la ruta
 
   const categoriasFiltradas = categorias.filter(
@@ -27,23 +42,32 @@ const AgregarCompetencia = () => {
 
   useEffect(() => {
     if (!disciplina) return; // Si no hay disciplina seleccionada, no hace nada
-
+  
     const fetchPruebas = async () => {
       try {
         const response = await fetch(`http://localhost:4000/api/pruebas?disciplina=${disciplina}`);
         const data = await response.json();
-
+  
         // Filtrar las pruebas por la propiedad 'Disciplina'
         const pruebasFiltradas = data.filter(prueba => prueba.Disciplina === disciplina);
-        setPruebas(pruebasFiltradas); // Guardar las pruebas filtradas en el estado
+  
+        // Ordenar las pruebas por el número al inicio del nombre
+        const pruebasOrdenadas = pruebasFiltradas.sort((a, b) => {
+          const numeroA = parseInt(a.Nombre.split(' ')[0], 10);
+          const numeroB = parseInt(b.Nombre.split(' ')[0], 10);
+          return numeroA - numeroB;
+        });
+  
+        setPruebas(pruebasOrdenadas); // Guardar las pruebas ordenadas en el estado
       } catch (error) {
         console.error("Error al obtener pruebas:", error);
         setError("Error al obtener pruebas");
       }
     };
-
+  
     fetchPruebas();
   }, [disciplina]);
+  
 
   // Filtrar pruebas por Estilo si la disciplina es Natación y el estilo es seleccionado
   const pruebasFiltradasPorEstilo = estilo
@@ -77,36 +101,50 @@ const AgregarCompetencia = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     const formData = new FormData();
     formData.append("Nombre", nombre);
     formData.append("Fecha", fecha);
-    formData.append("Disciplina", disciplina); // Usa directamente la disciplina seleccionada
+    formData.append("Disciplina", disciplina);
     formData.append("Categoria", categoriaId);
     formData.append("Genero", genero);
-
-    pruebasSeleccionadas.forEach((prueba) => {
-      formData.append("Pruebas[]", prueba.Nombre); // Enviar solo el Nombre
-    });
-
+  
     if (imagen) {
       formData.append("Imagen", imagen);
     }
-
+  
     try {
+      // **1. Crear la competencia**
       const response = await fetch("http://localhost:4000/api/competencias", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || "Error al crear la competencia");
       }
-
+  
+      const nuevaCompetencia = await response.json(); // Obtener la competencia creada
+      const competenciaId = nuevaCompetencia._id; // Guardar su ID
+  
+      // **2. Asociar la competencia con cada prueba seleccionada**
+      for (const prueba of pruebasSeleccionadas) {
+        await fetch(`http://localhost:4000/api/pruebas/${prueba._id}/competencias`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ competenciaId }),
+        });
+      }
+  
       await fetchData();
-      limpiarFormulario(); // Limpiar el formulario después de un envío exitoso
-      setModalOpen(false); // Cerrar el modal después de enviar
+      limpiarFormulario(); 
+      setModalOpen(false);
+  
+      // Llamar al toast de éxito
+      showToast("Competencia creada con éxito", 'success');
     } catch (error) {
       console.error("Error:", error);
       setError(error.message);
@@ -114,6 +152,7 @@ const AgregarCompetencia = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="p-6 mx-auto poppins">
@@ -161,9 +200,11 @@ const AgregarCompetencia = () => {
                 required
               >
                 <option value="">Seleccione Disciplina</option>
-                <option value="Natacion">Natación</option>
-                <option value="Acuatlon">Acuatlón</option>
-                <option value="Triatlon">Triatlón</option>
+                {disciplinasDisponibles.map((disc) => (
+                  <option key={disc} value={disc}>
+                    {disc}
+                  </option>
+                ))}
               </select>
 
               {/* Categoría (Bloqueado hasta que se seleccione una Disciplina) */}
@@ -216,6 +257,7 @@ const AgregarCompetencia = () => {
                   <option value="Espalda">Espalda</option>
                   <option value="Pecho">Pecho</option>
                   <option value="Fly">Fly</option>
+                  <option value="C.I">Combinado</option>
                 </select>
               )}
 

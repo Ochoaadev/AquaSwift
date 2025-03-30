@@ -83,8 +83,11 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
 
   return (
     <>
-      {/* Agregar MasInfo con el estado de apertura del modal */}
-      <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pruebas={competencia.Pruebas} />
+      <MasInfo 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        competencia={competencia} 
+      />
       <div className="bg-primary-300 rounded-xl transition hover:scale-105 duration-200 p-5 flex flex-col lg:flex-row justify-start items-center gap-5">
         <img
           src={competencia.Imagen?.url}

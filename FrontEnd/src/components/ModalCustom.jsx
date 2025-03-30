@@ -48,7 +48,7 @@ export function ModalCustom({
         </div>
         <div className="p-4">
           {children || <div className="mb-6">{message}</div>}
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-center gap-2 flex-wrap mt-4">
             {onConfirm && (
               <button 
                 className="px-4 py-2 border rounded-md hover:bg-gray-100" 
@@ -58,7 +58,7 @@ export function ModalCustom({
               </button>
             )}
             <button
-              className={`px-4 py-2 rounded-md ${buttonColors[type]}`}
+              className={`px-4 py-2 rounded-xl ${buttonColors[type]}`}
               onClick={() => {
                 if (onConfirm) onConfirm();
                 else onClose();

@@ -101,7 +101,7 @@ router.delete("/pruebas/:id", deletePrueba);
 
 // Rutas específicas para manejo de competencias
 router.get('/pruebas/competencia/:competenciaId', getPruebasByCompetencia); // Obtener pruebas por competencia
-router.post('/pruebas/:id/competencias', addCompetenciaToPrueba); // Añadir competencia a prueba
+router.patch('/pruebas/:id/competencias', addCompetenciaToPrueba); // Añadir competencia a prueba
 router.delete('/pruebas/:id/competencias/:competenciaId', removeCompetenciaFromPrueba); // Remover competencia de prueba
 
 //Recuperación de contraseña

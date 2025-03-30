@@ -83,7 +83,11 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
 
   return (
     <>
-      <MasInfo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pruebas={competencia.Pruebas} /> {/* Aquí se agrega el componente MasInfo */}
+      <MasInfo 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        competencia={competencia} 
+      />
       <div className="bg-primary-150 rounded-xl transition hover:scale-105 duration-200 p-5 flex flex-col lg:flex-row justify-start items-center gap-5">
         <img
           src={competencia.Imagen?.url}
@@ -142,7 +146,7 @@ const CompetenciaCard = ({ competencia, onDelete }) => {
               <p className="text-lg text-center lg:text-left"><span className="font-bold">Disciplina: </span>{competencia.Disciplina}</p>
               <p className="text-lg text-center lg:text-left"><span className="font-bold">Género: </span>{competencia.Genero}</p>
               <div className="grid grid-cols-2 lg:grid-cols-1 lg:justify-start gap-2 mt-2">
-                <button onClick={() => setIsModalOpen(true)} className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl">
+                <button onClick={() => setIsModalOpen(true)} className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-xl transition hover:scale-105 duration-200">
                   Más Info
                 </button>
                 <div className="flex gap-3">

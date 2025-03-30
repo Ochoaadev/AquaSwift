@@ -14,7 +14,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'competencias', // Carpeta en Cloudinary
-    allowed_formats: ['jpg', 'png', 'jpeg', 'gif'], // Formatos permitidos
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'], // Formatos permitidos
     transformation: [{ width: 500, height: 500, crop: 'limit' }] // Transformaciones opcionales
   }
 });
