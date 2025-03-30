@@ -19,21 +19,11 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
 
   const fetchPruebas = async () => {
     try {
-      setLoading(true);
       const response = await api.prueba.getByCompetencia(competencia._id);
-      
-      // Ordenar pruebas por nombre o categoría si es necesario
-      const pruebasOrdenadas = response.sort((a, b) => 
-        a.Nombre.localeCompare(b.Nombre)
-      );
-      
-      setPruebas(pruebasOrdenadas);
-      setError(null);
+      setPruebas(response);
     } catch (err) {
       setError('Error al cargar las pruebas disponibles');
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -135,43 +125,33 @@ const Inscripcion = ({ isOpen, onClose, competencia }) => {
         </p>
 
         <div className="max-h-60 overflow-y-auto">
-  {loading ? (
-    <div className="flex justify-center py-4">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-100"></div>
-    </div>
-  ) : pruebas.length === 0 ? (
-    <p className="text-gray-500">No hay pruebas disponibles para esta competencia</p>
-  ) : (
-    <ul className="space-y-2">
-      {pruebas.map(prueba => (
-        <li key={prueba._id} className="flex items-start">
-          <input
-            type="checkbox" 
-            id={`prueba-${prueba._id}`}
-            checked={selectedPruebas.includes(prueba._id)}
-            onChange={() => handlePruebaSelection(prueba._id)}
-            className="mt-1 mr-2 h-5 w-5 text-primary-100 rounded focus:ring-primary-100"
-            disabled={
-              selectedPruebas.includes(prueba._id) || 
-              (selectedPruebas.length >= 4 && !selectedPruebas.includes(prueba._id))
-            }
-          />
-          <div className="flex-1">
-            <label htmlFor={`prueba-${prueba._id}`} className="block text-gray-700 font-medium">
-              {prueba.Nombre}
-            </label>
-            <div className="text-sm text-gray-500">
-              {prueba.Disciplina} • {prueba.Estilo}
-              {selectedPruebas.includes(prueba._id) && (
-                <span className="ml-2 text-green-500">✓ Seleccionada</span>
-              )}
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
+          {pruebas.length === 0 ? (
+            <p className="text-gray-500">No hay pruebas disponibles para esta competencia</p>
+          ) : (
+            <ul className="space-y-2">
+              {pruebas.map(prueba => (
+                <li key={prueba._id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`prueba-${prueba._id}`}
+                    checked={selectedPruebas.includes(prueba._id)}
+                    onChange={() => handlePruebaSelection(prueba._id)}
+                    className="mr-2 h-5 w-5 text-primary-100 rounded focus:ring-primary-100"
+                    disabled={selectedPruebas.includes(prueba._id) && 
+                              selectedPruebas.findIndex(id => id === prueba._id) < 
+                              pruebas.length - (pruebas.length - selectedPruebas.length)}
+                  />
+                  <label htmlFor={`prueba-${prueba._id}`} className="text-gray-700">
+                    {prueba.Nombre} ({prueba.Genero})
+                    {selectedPruebas.includes(prueba._id) && (
+                      <span className="ml-2 text-green-500 text-sm">✓ Inscrito</span>
+                    )}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </ModalCustom>
   );
