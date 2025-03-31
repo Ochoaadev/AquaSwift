@@ -56,6 +56,10 @@ const getInscripcionesByAtleta = async (atletaId, token = null) => {
   return request(`/api/inscripciones/atleta/${atletaId}`, 'GET', null, token);
 };
 
+const getByIdCompet = async (id, token = null) => {
+  return request(`/api/competencias/${id}`, 'GET', null, token);
+};
+
 export const api = {
   auth: {
     register: (data) => request('/auth/register', 'POST', data),
@@ -70,6 +74,7 @@ export const api = {
   competencia: {
     deleteCompetencia,
     updateCompetencia,
+    getByIdCompet
   },
   inscripcion: {
     create: createInscripcion,
