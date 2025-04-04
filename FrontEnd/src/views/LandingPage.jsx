@@ -1,9 +1,40 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";;
 import Banner from "/bannerNata.jpg";
 import Acuatlon from "/Acuatlon.png";
 import Ironman from "/ironman.png";
+import aguaSound from "/Agua.mp3";
 
 export default function LandingPage() {
+
+  const [audio] = useState(new Audio(aguaSound));
+  useEffect(() => {
+    const enableAudio = () => {
+      audio.loop = true;
+      audio.volume = 0.5;
+
+      audio.play().catch((error) => {
+        console.error("Error al reproducir el audio:", error);
+      });
+
+      // Removemos los event listeners después de la primera interacción
+      document.removeEventListener("mousemove", enableAudio);
+      document.removeEventListener("keydown", enableAudio);
+    };
+
+    // Esperamos la primera interacción del usuario
+    document.addEventListener("mousemove", enableAudio);
+    document.addEventListener("keydown", enableAudio);
+
+    return () => {
+      document.removeEventListener("mousemove", enableAudio);
+      document.removeEventListener("keydown", enableAudio);
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [audio]);
+
+
   return (
 <>
       <div className='px-5 w-11/12 mx-auto mt-5 '>

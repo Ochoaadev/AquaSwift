@@ -17,14 +17,6 @@ const ResultadosCompetencias = () => {
         <h1 className="text-3xl lg:text-5xl font-bold lg:mt-12 mt-7 text-center">Resultados por Competencia</h1>
       </div>
 
-      <div className="my-6">
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-[#6b4c8f] text-white rounded hover:bg-[#6b4c8f]/80"
-        >
-          Agregar Resultados
-        </button>
-      </div>
 
       {["Natacion", "Acuatlon", "Triatlon"].map((disciplina, index) => {
         const colorClasses = ["text-primary-100", "text-primary-300", "text-primary-400"];
@@ -38,11 +30,12 @@ const ResultadosCompetencias = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-4">
               {competencias.map((competencia) => (
                 <CompetenciaResultadosCard
-                  key={competencia._id}
-                  competencia={competencia}
-                  bgColorClass={bgColorClasses[index]}
-                  onViewResults={() => setSelectedCompetencia(competencia)}
-                />
+                key={competencia._id}
+                competencia={competencia}
+                bgColorClass={bgColorClasses[index]}
+                onViewResults={() => setSelectedCompetencia(competencia)}
+                onAddResults={() => setShowAddModal(true)} 
+              />              
               ))}
             </div>
           </div>
@@ -85,7 +78,7 @@ const ResultadosCompetencias = () => {
   );
 };
 
-const CompetenciaResultadosCard = ({ competencia, bgColorClass, onViewResults }) => {
+const CompetenciaResultadosCard = ({ competencia, bgColorClass, onViewResults, onAddResults  }) => {
   return (
     <div className={`${bgColorClass} rounded-xl p-5 flex flex-col lg:flex-row justify-start items-center gap-5 transition hover:scale-105 duration-200`}>
       <img
@@ -106,12 +99,22 @@ const CompetenciaResultadosCard = ({ competencia, bgColorClass, onViewResults })
           
           
           <div className="grid grid-cols-1 lg:justify-start mt-2">
+
+                        
+            <button
+                  onClick={() => onAddResults(true)}
+                  className="w-full mb-2 bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-1 px-3 rounded-xl"
+                >
+                  Agregar Resultados
+            </button>
+
             <button 
               onClick={onViewResults}
               className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-1 px-3 rounded-xl"
             >
-              + Resultados
+              Ver Resultados
             </button>
+
           </div>
         </div>
       </div>
