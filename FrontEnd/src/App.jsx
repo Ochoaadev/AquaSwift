@@ -24,6 +24,7 @@ import Login from "./views/Login";
 import UserHome from "./views/User/UserHome";
 import MisCompetencias from "./views/User/MisCompetencias";
 import Perfil from "./views/User/Perfil";
+import ResultCompet from './views/User/ResultCompet'
 
 //Admin
 import AdminHome from "./views/Admin/AdminHome";
@@ -122,6 +123,19 @@ function AnimatedRoutes() {
               element={
                 <PageTransition>
                   <Perfil />
+                </PageTransition>
+              }
+              allowedRoles={["Usuario"]}
+            />
+          }
+        />
+                <Route
+          path='/resultado'
+          element={
+            <ProtectedRoute
+              element={
+                <PageTransition>
+                  <ResultCompet />
                 </PageTransition>
               }
               allowedRoles={["Usuario"]}

@@ -11,6 +11,7 @@ const {createCategoria, deleteCategoria, getCategoriaById, getCategorias, update
 const {createInscripcion, getAllInscripciones, getInscripcionesByAtleta, getInscripcionesByCompetencia, getInscripcionesByPrueba, updateInscripcion, deleteInscripcion} = require('../controllers/InscripController');
 const {createPrueba, getPruebas, getPruebasByCompetencia, deletePrueba, addCompetenciaToPrueba, removeCompetenciaFromPrueba} = require('../controllers/PruebaController');
 const {solicitarRecuperacion, cambiarContrasena} = require('../controllers/User/RestorePassword')
+const {createResultado, deleteResultado, getResultadosByCompetencia, getResultadosByPrueba, updateResultado } = require('../controllers/ResultController');
 
 //Filtro de busqueda
 
@@ -18,8 +19,9 @@ const {filtrar} = require('../controllers/Filtro')
 
 //Importación de middlewares a usar
 
-const {ChequeoExistenciaUser, verifySession} = require('../middlewares/VerifyExistingUser')
+const {ChequeoExistenciaUser, verifySession} = require('../middlewares/VerifyExistingUser');
 const upload = require('../middlewares/multer');
+const {exportToExcel, exportToPDF} = require('../middlewares/ExportsDocuments');
 
 //Rutas definidas
 
@@ -108,5 +110,24 @@ router.delete('/pruebas/:id/competencias/:competenciaId', removeCompetenciaFromP
 
 router.post('/solicitar-recuperacion', solicitarRecuperacion);
 router.post('/reset-password/:token', cambiarContrasena);
+
+//Resultados
+
+// Rutas CRUD
+router.post('/competencias/:competenciaId/resultados', createResultado);
+  
+router.get('/competencias/:competenciaId/resultados',getResultadosByCompetencia );
+  
+router.get('/competencias/:competenciaId/pruebas/:pruebaId/resultados', getResultadosByPrueba);
+  
+router.put('/resultados/:id', updateResultado);
+  
+router.delete('/resultados/:id', deleteResultado);
+  
+// Rutas de exportación
+
+router.get('/competencias/:competenciaId/export/excel',exportToExcel);
+  
+router.get('/competencias/:competenciaId/export/pdf', exportToPDF);
 
 module.exports = router
