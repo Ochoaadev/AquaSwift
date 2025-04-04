@@ -38,13 +38,13 @@ const getExportData = async (competenciaId) => {
 // Función para obtener el nombre del atleta de manera segura
 const getNombreAtleta = (atleta) => {
   if (!atleta) return 'Atleta no disponible';
-  
+
   // Primero intentamos con Nombre_Apellido
   if (atleta.Nombre_Apellido) return atleta.Nombre_Apellido;
-  
+
   // Si no existe, usamos Nombre y Apellido por separado
   if (atleta.Nombre && atleta.Apellido) return `${atleta.Nombre} ${atleta.Apellido}`;
-  
+
   // Si no hay ningún nombre válido
   return 'Nombre no disponible';
 };
@@ -57,13 +57,12 @@ exports.exportToExcel = async (req, res) => {
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Resultados');
-    
+
     worksheet.columns = [
       { header: 'Prueba', key: 'prueba', width: 30 },
       { header: 'Posición', key: 'posicion', width: 10 },
       { header: 'Atleta', key: 'atleta', width: 30 },
       { header: 'Marca', key: 'marca', width: 15 },
-      { header: 'Puntos', key: 'puntos', width: 10 }
     ];
 
     resultados.forEach(resultado => {
@@ -72,7 +71,6 @@ exports.exportToExcel = async (req, res) => {
         posicion: resultado.Posicion,
         atleta: getNombreAtleta(resultado.Atleta),
         marca: resultado.Marca,
-        puntos: resultado.Puntos
       });
     });
 
@@ -89,9 +87,9 @@ exports.exportToExcel = async (req, res) => {
     res.end();
   } catch (error) {
     console.error('Error en exportToExcel:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error al exportar a Excel',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -103,7 +101,7 @@ exports.exportToPDF = async (req, res) => {
     const { competencia, resultados } = await getExportData(competenciaId);
 
     const doc = new PDFDocument({ margin: 50 });
-    
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
@@ -115,12 +113,16 @@ exports.exportToPDF = async (req, res) => {
     // Encabezado
     doc.fontSize(20).text(`Resultados: ${competencia.Nombre}`, { align: 'center' });
     doc.moveDown();
-    doc.fontSize(12).text(`Fecha: ${competencia.Fecha.toLocaleDateString()}`, { align: 'center' });
+    if (competencia.Fecha) {
+      doc.fontSize(12).text(`Fecha: ${competencia.Fecha.toLocaleDateString()}`, { align: 'center' });
+    } else {
+      doc.fontSize(12).text('Fecha no disponible', { align: 'center' });
+    }
     doc.moveDown(2);
 
     // Agrupar por prueba
     const porPrueba = resultados.reduce((acc, resultado) => {
-      const clave = resultado.Prueba?._id?.toString() || 'sin-prueba';
+      const clave = (resultado.Prueba && resultado.Prueba._id) ? resultado.Prueba._id.toString() : 'sin-prueba';
       if (!acc[clave]) {
         acc[clave] = {
           nombre: resultado.Prueba?.Nombre || 'Prueba no disponible',
@@ -145,19 +147,17 @@ exports.exportToPDF = async (req, res) => {
         .fontSize(12)
         .text('Posición', startX, yPosition)
         .text('Atleta', startX + columnWidth, yPosition)
-        .text('Marca', startX + columnWidth * 2, yPosition)
-        .text('Puntos', startX + columnWidth * 3, yPosition);
+        .text('Marca', startX + columnWidth * 2, yPosition);
 
       yPosition += 25;
 
       // Filas
       doc.font('Helvetica').fontSize(10);
       prueba.resultados.forEach(resultado => {
-        doc.text(resultado.Posicion.toString(), startX, yPosition)
+        doc.text((resultado.Posicion || 'Posición no disponible').toString(), startX, yPosition)
           .text(getNombreAtleta(resultado.Atleta), startX + columnWidth, yPosition)
-          .text(resultado.Marca, startX + columnWidth * 2, yPosition)
-          .text(resultado.Puntos.toString(), startX + columnWidth * 3, yPosition);
-        
+          .text(resultado.Marca, startX + columnWidth * 2, yPosition);
+
         yPosition += 20;
       });
 
@@ -167,9 +167,9 @@ exports.exportToPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error('Error en exportToPDF:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error al exportar a PDF',
-      error: error.message 
+      error: error.message
     });
   }
 };

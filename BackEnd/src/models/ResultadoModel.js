@@ -19,7 +19,7 @@ const ResultadoSchema = new Schema({
   },
   Posicion: {
     type: Number,
-    required: true
+    required: false
   },
   Marca: {
     type: String,

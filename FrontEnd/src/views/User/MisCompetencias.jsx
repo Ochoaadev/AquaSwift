@@ -12,8 +12,76 @@ const MisCompetencias = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [pruebasSeleccionadas, setPruebasSeleccionadas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [competenciaResultados, setCompetenciaResultados] = useState(null);
 
   const navigate = useNavigate();
+
+  const fetchResultadosCompetencia = async (competenciaId) => {
+    try {
+      setLoading(true);
+      const response = await api.resultado.getByCompetencia(competenciaId);
+      
+      if (response && typeof response === 'object') {
+        const resultadosProcesados = {};
+        
+        await Promise.all(Object.values(response).map(async (pruebaData) => {
+          const pruebaId = pruebaData.Prueba._id;
+          const pruebaNombre = pruebaData.Prueba.Nombre;
+          
+          // Ordenar y asignar posiciones
+          const resultadosOrdenados = pruebaData.resultados
+            .map(resultado => ({
+              ...resultado,
+              tiempoEnSegundos: convertirTiempoASegundos(resultado.Marca)
+            }))
+            .sort((a, b) => a.tiempoEnSegundos - b.tiempoEnSegundos)
+            .map((resultado, index) => ({
+              ...resultado,
+              Posicion: index + 1
+            }));
+  
+          // Actualizar posiciones en la base de datos
+          await Promise.all(resultadosOrdenados.map(async (resultado) => {
+            try {
+              await api.resultado.update(resultado._id, {
+                Posicion: resultado.Posicion
+              });
+            } catch (err) {
+              console.error('Error al actualizar posición:', err);
+            }
+          }));
+          
+          resultadosProcesados[pruebaId] = {
+            nombre: pruebaNombre,
+            resultados: resultadosOrdenados
+          };
+        }));
+        
+        return resultadosProcesados;
+      }
+      
+      return {};
+    } catch (err) {
+      console.error('Error al obtener resultados:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const convertirTiempoASegundos = (tiempo) => {
+    if (!tiempo) return Infinity;
+    
+    const partes = tiempo.split(':').map(part => parseFloat(part) || 0);
+    
+    if (partes.length === 3) {
+      return partes[0] * 3600 + partes[1] * 60 + partes[2];
+    } else if (partes.length === 2) {
+      return partes[0] * 60 + partes[1];
+    } else {
+      return partes[0];
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,12 +203,6 @@ const MisCompetencias = () => {
     }, {});
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
-
   if (error) return (
     <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mx-4 my-6">
       <p>{error}</p>
@@ -250,15 +312,22 @@ const MisCompetencias = () => {
                                 Ver Pruebas
                               </button>
                             </div>
-                            <div>
-                              <button
-                                className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-lg transition hover:scale-105 duration-200"
-                                disabled
-                                title="Funcionalidad próximamente disponible"
-                              >
-                                Mostrar resultados
-                              </button>
-                            </div>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const resultados = await fetchResultadosCompetencia(grupo.competencia._id);
+                                  setCompetenciaResultados({
+                                    competencia: grupo.competencia,
+                                    resultados
+                                  });
+                                } catch (err) {
+                                  setError("Error al cargar los resultados");
+                                }
+                              }}
+                              className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold py-1 px-3 rounded-lg transition hover:scale-105 duration-200"
+                            >
+                              Mostrar resultados
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -297,6 +366,60 @@ const MisCompetencias = () => {
           </div>
         </div>
       )}
+
+{competenciaResultados && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div className="w-full max-w-4xl max-h-[90vh] rounded-lg bg-white shadow-lg overflow-y-auto">
+      <div className="flex items-center p-4 border-b bg-[#6b4c8f] text-white rounded-t-lg">
+        <h2 className="text-lg font-semibold">
+          Resultados: {competenciaResultados.competencia.Nombre}
+        </h2>
+        <button 
+          onClick={() => setCompetenciaResultados(null)} 
+          className="ml-auto text-2xl font-bold text-slate-200 hover:text-slate-400"
+        >
+          &times;
+        </button>
+      </div>
+      
+      <div className="p-4">
+        {Object.keys(competenciaResultados.resultados).length > 0 ? (
+          <div className="space-y-8">
+            {Object.entries(competenciaResultados.resultados).map(([pruebaId, {nombre, resultados}]) => (
+              <div key={pruebaId} className="mb-6">
+                <h3 className="text-xl font-semibold mb-4 text-black">{nombre}</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 text-center">
+                      <tr>
+                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Posición</th>
+                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Atleta</th>
+                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200 text-center text-black">
+                      {resultados.map((resultado) => (
+                        <tr key={resultado._id}>
+                          <td className="px-6 py-4 whitespace-nowrap">{resultado.Posicion}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {resultado.Atleta?.Nombre_Apellido || 'Atleta desconocido'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{resultado.Marca}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No hay resultados registrados para esta competencia.</p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

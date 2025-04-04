@@ -17,6 +17,14 @@ const ResultadosCompetencias = () => {
         <h1 className="text-3xl lg:text-5xl font-bold lg:mt-12 mt-7 text-center">Resultados por Competencia</h1>
       </div>
 
+      <div className="flex justify-center items-center mt-5">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-gradient-to-r text-3xl  from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-2 px-4 rounded-xl"
+              >
+                + Agregar Resultados
+              </button>  
+      </div>
 
       {["Natacion", "Acuatlon", "Triatlon"].map((disciplina, index) => {
         const colorClasses = ["text-primary-100", "text-primary-300", "text-primary-400"];
@@ -100,14 +108,6 @@ const CompetenciaResultadosCard = ({ competencia, bgColorClass, onViewResults, o
           
           <div className="grid grid-cols-1 lg:justify-start mt-2">
 
-                        
-            <button
-                  onClick={() => onAddResults(true)}
-                  className="w-full mb-2 bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-1 px-3 rounded-xl"
-                >
-                  Agregar Resultados
-            </button>
-
             <button 
               onClick={onViewResults}
               className="w-full bg-gradient-to-r from-[#1E40AF] to-[#9333EA] text-white font-bold transition hover:scale-105 duration-200 py-1 px-3 rounded-xl"
@@ -123,7 +123,7 @@ const CompetenciaResultadosCard = ({ competencia, bgColorClass, onViewResults, o
 };
 
 const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
-  const [resultados, setResultados] = useState([]);
+  const [resultadosAgrupados, setResultadosAgrupados] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -137,23 +137,52 @@ const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
         setLoading(true);
         const response = await api.resultado.getByCompetencia(competencia._id);
         
-        let resultadosNormalizados = [];
-        
         if (response && typeof response === 'object') {
-          resultadosNormalizados = Object.values(response).flatMap(pruebaData => {
-            return pruebaData.resultados.map(resultado => ({
-              ...resultado,
-              Prueba: pruebaData.Prueba
-            }));
-          });
-        }
+          const resultadosProcesados = {};
+          
+          await Promise.all(Object.values(response).map(async (pruebaData) => {
+            const pruebaId = pruebaData.Prueba._id;
+            const pruebaNombre = pruebaData.Prueba.Nombre;
+            
+            // Ordenar y asignar posiciones
+            const resultadosOrdenados = pruebaData.resultados
+              .map(resultado => ({
+                ...resultado,
+                tiempoEnSegundos: convertirTiempoASegundos(resultado.Marca)
+              }))
+              .sort((a, b) => a.tiempoEnSegundos - b.tiempoEnSegundos)
+              .map((resultado, index) => ({
+                ...resultado,
+                Posicion: index + 1
+              }));
 
-        setResultados(resultadosNormalizados);
+            // Actualizar posiciones en la base de datos
+            await Promise.all(resultadosOrdenados.map(async (resultado) => {
+              try {
+                await api.resultado.update(resultado._id, {
+                  Posicion: resultado.Posicion
+                });
+              } catch (err) {
+                console.error('Error al actualizar posición:', err);
+              }
+            }));
+            
+            resultadosProcesados[pruebaId] = {
+              nombre: pruebaNombre,
+              resultados: resultadosOrdenados
+            };
+          }));
+          
+          setResultadosAgrupados(resultadosProcesados);
+        } else {
+          setResultadosAgrupados({});
+        }
+        
         setError(null);
       } catch (err) {
         console.error('Error al obtener resultados:', err);
         setError(err.message || 'Error al cargar resultados');
-        setResultados([]);
+        setResultadosAgrupados({});
       } finally {
         setLoading(false);
       }
@@ -161,6 +190,21 @@ const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
 
     fetchResultados();
   }, [competencia._id]);
+
+  // Función para convertir tiempo a segundos
+  const convertirTiempoASegundos = (tiempo) => {
+    if (!tiempo) return Infinity; // Usar Infinity para que los tiempos vacíos aparezcan al final
+    
+    const partes = tiempo.split(':').map(part => parseFloat(part) || 0);
+    
+    if (partes.length === 3) {
+      return partes[0] * 3600 + partes[1] * 60 + partes[2];
+    } else if (partes.length === 2) {
+      return partes[0] * 60 + partes[1];
+    } else {
+      return partes[0];
+    }
+  };
 
   const handleDeleteResultado = async (resultadoId) => {
     try {
@@ -235,7 +279,7 @@ const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity" onClick={onClose}>
       <div 
-        className="w-full max-w-4xl max-h-[90vh] rounded-lg bg-white text-black shadow-lg transition-all overflow-y-auto"
+        className="w-full max-w-6xl max-h-[90vh] rounded-lg bg-white text-black shadow-lg transition-all overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center p-4 border-b bg-[#6b4c8f] text-white rounded-t-lg">
@@ -257,32 +301,14 @@ const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
               disabled={exporting || loading}
               className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
             >
-              {exporting === 'excel' ? (
-                'Exportando...'
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  Excel
-                </>
-              )}
+              {exporting === 'excel' ? 'Exportando...' : 'Excel'}
             </button>
             <button
               onClick={() => handleExport('pdf')}
               disabled={exporting || loading}
               className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
             >
-              {exporting === 'pdf' ? (
-                'Exportando...'
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  PDF
-                </>
-              )}
+              {exporting === 'pdf' ? 'Exportando...' : 'PDF'}
             </button>
           </div>
 
@@ -290,42 +316,54 @@ const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
           {loading && <div className="text-center py-4">Cargando resultados...</div>}
           {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
-          {!loading && resultados.length > 0 ? (
-            <div className="space-y-6">
-              {resultados.map((resultado) => (
-                <div key={`${resultado._id}-${resultado.Prueba?._id}`} className="mb-4 p-4 border rounded-lg">
-                  <h4 className="font-medium text-lg mb-2">
-                    Prueba: {resultado.Prueba?.Nombre || 'Prueba desconocida'}
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p><span className="font-semibold">Atleta:</span> {resultado.Atleta?.Nombre_Apellido || 'Atleta desconocido'}</p>
-                      <p><span className="font-semibold">Posición:</span> {resultado.Posicion}</p>
+          {!loading && Object.keys(resultadosAgrupados).length > 0 ? (
+            <div className="space-y-8">
+              {Object.entries(resultadosAgrupados).map(([pruebaId, {nombre, resultados}]) => (
+                <div key={pruebaId} className="mb-6">
+                  <h3 className="text-xl font-semibold mb-4">{nombre}</h3>
+                  <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50 text-center">
+                          <tr>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Posición</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Atleta</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Registro</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200 text-center">
+                          {resultados.map((resultado) => (
+                            <tr key={resultado._id}>
+                              <td className="px-6 py-4 whitespace-nowrap">{resultado.Posicion}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {resultado.Atleta?.Nombre_Apellido || 'Atleta desconocido'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">{resultado.Marca}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                {new Date(resultado.FechaRegistro).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex justify-center gap-3">
+                                  <button
+                                    onClick={() => onEditResultado(resultado)}
+                                    className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                  >
+                                    Editar
+                                  </button>
+                                  <button
+                                    onClick={() => confirmDelete(resultado._id)}
+                                    className="text-red-600 hover:text-red-900 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                                  >
+                                    Eliminar
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                    <div>
-                      <p><span className="font-semibold">Marca:</span> {resultado.Marca}</p>
-                      <p><span className="font-semibold">Puntos:</span> {resultado.Puntos}</p>
-                    </div>
-                    <div className="md:col-span-2">
-                      <p><span className="font-semibold">Fecha Registro:</span> {new Date(resultado.FechaRegistro).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex justify-end gap-2">
-                    <button 
-                      onClick={() => onEditResultado(resultado)}
-                      disabled={loading}
-                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                    >
-                      Editar
-                    </button>
-                    <button 
-                      onClick={() => confirmDelete(resultado._id)}
-                      disabled={loading}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
@@ -372,12 +410,18 @@ const ResultadosViewModal = ({ competencia, onClose, onEditResultado }) => {
 
 const EditarResultadoModal = ({ resultado, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
-    Posicion: resultado.Posicion,
     Marca: resultado.Marca,
-    Puntos: resultado.Puntos
+    Posicion: resultado.Posicion || 0
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Obtener nombre de prueba y atleta de manera segura
+  const nombrePrueba = resultado.Prueba?.Nombre || 
+                      (typeof resultado.Prueba === 'string' ? resultado.Prueba : 'Prueba desconocida');
+  
+  const nombreAtleta = resultado.Atleta?.Nombre_Apellido || 
+                      (typeof resultado.Atleta === 'string' ? resultado.Atleta : 'Atleta desconocido');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -399,17 +443,12 @@ const EditarResultadoModal = ({ resultado, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity">
-      <div 
-        className="w-full max-w-md rounded-lg bg-white text-black shadow-lg transition-all overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="w-full max-w-md rounded-lg bg-white text-black shadow-lg transition-all overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}>
+        
         <div className="flex items-center p-4 border-b bg-[#6b4c8f] text-white rounded-t-lg">
           <h2 className="text-lg font-semibold">Editar Resultado</h2>
-          <button 
-            onClick={onClose} 
-            className="ml-auto text-2xl font-bold text-slate-200 hover:text-slate-400" 
-            aria-label="Cerrar"
-          >
+          <button onClick={onClose} className="ml-auto text-2xl font-bold text-slate-200 hover:text-slate-400" aria-label="Cerrar">
             &times;
           </button>
         </div>
@@ -422,7 +461,7 @@ const EditarResultadoModal = ({ resultado, onClose, onUpdate }) => {
               <label className="block mb-2 font-medium">Atleta:</label>
               <input
                 type="text"
-                value={resultado.Atleta?.Nombre_Apellido || 'Atleta desconocido'}
+                value={nombreAtleta}
                 disabled
                 className="w-full p-2 border rounded bg-gray-100"
               />
@@ -432,28 +471,14 @@ const EditarResultadoModal = ({ resultado, onClose, onUpdate }) => {
               <label className="block mb-2 font-medium">Prueba:</label>
               <input
                 type="text"
-                value={resultado.Prueba?.Nombre || 'Prueba desconocida'}
+                value={nombrePrueba}
                 disabled
                 className="w-full p-2 border rounded bg-gray-100"
               />
             </div>
 
             <div className="mb-4">
-              <label className="block mb-2 font-medium">Posición:</label>
-              <input
-                type="number"
-                name="Posicion"
-                value={formData.Posicion}
-                onChange={handleInputChange}
-                min="1"
-                required
-                disabled={loading}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-2 font-medium">Marca:</label>
+              <label className="block mb-2 font-medium">Tiempo:</label>
               <input
                 type="text"
                 name="Marca"
@@ -466,15 +491,12 @@ const EditarResultadoModal = ({ resultado, onClose, onUpdate }) => {
             </div>
 
             <div className="mb-4">
-              <label className="block mb-2 font-medium">Puntos:</label>
+              <label className="block mb-2 font-medium">Posición:</label>
               <input
                 type="number"
-                name="Puntos"
-                value={formData.Puntos}
-                onChange={handleInputChange}
-                min="0"
-                disabled={loading}
-                className="w-full p-2 border rounded"
+                value={formData.Posicion}
+                disabled
+                className="w-full p-2 border rounded bg-gray-100"
               />
             </div>
 
@@ -507,9 +529,7 @@ const ResultadosAddModal = ({ onClose, onResultAdded }) => {
     competenciaId: '',
     Prueba: '',
     Atleta: '',
-    Posicion: '',
     Marca: '',
-    Puntos: ''
   });
   const [competencias, setCompetencias] = useState([]);
   const [pruebas, setPruebas] = useState([]);
@@ -577,9 +597,85 @@ const ResultadosAddModal = ({ onClose, onResultAdded }) => {
     fetchAtletas();
   }, [formData.Prueba, formData.competenciaId]);
 
+  // Función para formatear el tiempo según el tipo de prueba
+  const formatTimeInput = (value, pruebaNombre) => {
+    if (!value) return value;
+    
+    // Limpiar caracteres no numéricos excepto : y .
+    let cleaned = value.replace(/[^\d:.]/g, '');
+    
+    // Si la prueba empieza con 50 (formato S.MS)
+    if (pruebaNombre && pruebaNombre.startsWith('50')) {
+      // Permitir solo un punto decimal
+      const parts = cleaned.split('.');
+      if (parts.length > 2) {
+        cleaned = parts[0] + '.' + parts.slice(1).join('');
+      }
+      return cleaned;
+    } 
+    // Para otras pruebas (formato M:S.MS)
+    else {
+      // Permitir solo dos puntos (uno para minutos:segundos y otro para decimales)
+      const parts = cleaned.split(':');
+      if (parts.length > 2) {
+        cleaned = parts.slice(0, 2).join(':') + ':' + parts.slice(2).join('');
+      }
+      
+      // Dividir en minutos y segundos
+      const timeParts = cleaned.split(':');
+      if (timeParts.length > 1) {
+        // Formatear segundos con máximo un punto decimal
+        const secondsParts = timeParts[1].split('.');
+        if (secondsParts.length > 2) {
+          timeParts[1] = secondsParts[0] + '.' + secondsParts.slice(1).join('');
+        }
+        return timeParts[0] + ':' + timeParts[1];
+      }
+      return cleaned;
+    }
+  };
+
+  // Obtener el nombre de la prueba seleccionada
+  const pruebaSeleccionada = pruebas.find(p => p._id === formData.Prueba);
+  const nombrePrueba = pruebaSeleccionada?.Nombre || '';
+
+  const handleTimeChange = (e) => {
+    const { value } = e.target;
+    const formattedValue = formatTimeInput(value, nombrePrueba);
+    setFormData(prev => ({ ...prev, Marca: formattedValue }));
+  };
+
+  // Función para validar el formato del tiempo
+  const validateTimeFormat = (time, pruebaNombre) => {
+    if (!time) return false;
+    
+    if (pruebaNombre && pruebaNombre.startsWith('50')) {
+      // Validar formato S.MS (ej. 23.45)
+      return /^\d{1,2}(\.\d{1,2})?$/.test(time);
+    } else {
+      // Validar formato M:S.MS (ej. 1:23.45)
+      return /^\d{1,2}:\d{1,2}(\.\d{1,2})?$/.test(time);
+    }
+  };
+
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const convertirTiempoASegundos = (tiempo) => {
+    if (!tiempo) return Infinity;
+    
+    const partes = tiempo.split(':').map(part => parseFloat(part) || 0);
+    
+    if (partes.length === 3) {
+      return partes[0] * 3600 + partes[1] * 60 + partes[2];
+    } else if (partes.length === 2) {
+      return partes[0] * 60 + partes[1];
+    } else {
+      return partes[0];
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -587,16 +683,41 @@ const ResultadosAddModal = ({ onClose, onResultAdded }) => {
     
     try {
       setLoading(true);
-      await api.resultado.create(
+      // Primero crear el resultado con posición 0
+      const nuevoResultado = await api.resultado.create(
         formData.competenciaId,
         {
           Prueba: formData.Prueba,
           Atleta: formData.Atleta,
-          Posicion: formData.Posicion,
           Marca: formData.Marca,
-          Puntos: formData.Puntos || 0
+          Posicion: 0
         }
       );
+
+      // Obtener todos los resultados de la prueba para recalcular posiciones
+      const response = await api.resultado.getByCompetencia(formData.competenciaId);
+      if (response && typeof response === 'object') {
+        const pruebaData = Object.values(response).find(p => p.Prueba._id === formData.Prueba);
+        if (pruebaData) {
+          const resultadosOrdenados = pruebaData.resultados
+            .map(resultado => ({
+              ...resultado,
+              tiempoEnSegundos: convertirTiempoASegundos(resultado.Marca)
+            }))
+            .sort((a, b) => a.tiempoEnSegundos - b.tiempoEnSegundos)
+            .map((resultado, index) => ({
+              ...resultado,
+              Posicion: index + 1
+            }));
+
+          // Actualizar todas las posiciones
+          await Promise.all(resultadosOrdenados.map(async (resultado) => {
+            await api.resultado.update(resultado._id, {
+              Posicion: resultado.Posicion
+            });
+          }));
+        }
+      }
       
       setError(null);
       onResultAdded();
@@ -606,6 +727,7 @@ const ResultadosAddModal = ({ onClose, onResultAdded }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity" onClick={onClose}>
@@ -686,45 +808,31 @@ const ResultadosAddModal = ({ onClose, onResultAdded }) => {
                 </select>
               </div>
 
-              <div>
-                <label className="block mb-2 font-medium">Posición:</label>
-                <input
-                  type="number"
-                  name="Posicion"
-                  value={formData.Posicion}
-                  onChange={handleInputChange}
-                  min="1"
-                  required
-                  disabled={loading}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
 
               <div>
-                <label className="block mb-2 font-medium">Marca:</label>
-                <input
-                  type="text"
-                  name="Marca"
-                  value={formData.Marca}
-                  onChange={handleInputChange}
-                  required
-                  disabled={loading}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2 font-medium">Puntos (opcional):</label>
-                <input
-                  type="number"
-                  name="Puntos"
-                  value={formData.Puntos}
-                  onChange={handleInputChange}
-                  min="0"
-                  disabled={loading}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
+              <label className="block mb-2 font-medium">Tiempo:</label>
+              <input
+                type="text"
+                name="Marca"
+                value={formData.Marca}
+                onChange={handleTimeChange}
+                required
+                disabled={loading}
+                className="w-full p-2 border rounded"
+                placeholder={
+                  nombrePrueba && nombrePrueba.startsWith('50') 
+                    ? "Ej: 23.45 (segundos.milisegundos)" 
+                    : "Ej: 1:23.45 (minutos:segundos.milisegundos)"
+                }
+              />
+              {formData.Marca && !validateTimeFormat(formData.Marca, nombrePrueba) && (
+                <p className="text-red-500 text-sm mt-1">
+                  Formato inválido. Use {nombrePrueba.startsWith('50') 
+                    ? "(ej. 23.45)" 
+                    : "(ej. 1:23.45)"}
+                </p>
+              )}
+            </div>
             </div>
 
             <div className="flex justify-end gap-2">
