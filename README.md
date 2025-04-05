@@ -6,7 +6,7 @@
    - Adolfo Ochoa
    - Juan Alvarez
    - Elias Guillen
-   - Esteban Gómez
+
 
   
 # Descripción
