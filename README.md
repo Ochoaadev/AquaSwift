@@ -38,10 +38,10 @@
 
   En el proyecto, se pueden realizas las siguientes acciones
 
-  -Funcionalidades General
-      * Login
-      * Registro
-
+  - Funcionalidades General
+    * Login
+    * Registro
+   
   - Para usuario
     * Inscribirse en competencia
     * Ver las competencias a la que se encuentra inscrita
