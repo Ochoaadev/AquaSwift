@@ -10,7 +10,7 @@
 
   
 # Descripción
-  - Por definir
+  - Sistema de gestion de competencias deportivas (Natacion, Acuatlon y Triatlon), que permite la creacion, edicion, eliminacion y actualizacion de Competencias. Permite el registro de Atletas a la pagina, donde tienen la opcion de inscribirse en su competencia correspondiente, seleccionando como maximo 6 pruebas en ella, y una vez pasada la competncia ver y descargar los resultados de sus pruebas. 
 
 # Maquetación
 
