@@ -13,13 +13,45 @@
   - Por definir
 
 # Maquetación
-  - Por definir
-  
-# Diseño de base de datos
-  - Por definir
+
+  Mediante el siguiente link, podrá visualizar el figma del proyecto:
+
+      https://www.figma.com/design/hLPzBs1tjFYrE3NWaJvcP5/AquaSwift?node-id=0-1
   
 # Comandos usados
-  - Por definir
+
+  Para clonar nuestro repositorio, usas el siguiente comando en la terminal de tu preferencia
+  
+      https://github.com/Ochoaadev/AquaSwift.git
+      
+  Para instalar dependencias de nuestro proyecto
+
+      npm install
+
+  Para inicializar el proyecto
+
+      npm run dev
+
+  Te en cuenta que, debes ejecutar este comando en la terminal del Backend, y en la Terminal del Front
 
 # Desarrollo de funcionalidades
-  -Por definir.
+
+  En el proyecto, se pueden realizas las siguientes acciones
+
+  -Funcionalidades General
+      * Login
+      * Registro
+
+  - Para usuario
+    * Inscribirse en competencia
+    * Ver las competencias a la que se encuentra inscrita
+    * Ver resultados de las competencias
+    * Ver su perfil (y en el, podrá realizar el cambio de contraseña de ser necesario)
+
+  - Para Admin
+    * Agregar competencia
+    * Agregar resultados
+    * Editar y elimina resultados
+    * Exportar resultados en PDF o Excel
+    * Listado de los usuarios
+    * Editar o eliminar algún usuario
